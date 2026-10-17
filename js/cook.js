@@ -274,7 +274,9 @@
     render();
 
     document.addEventListener('keydown', (e) => {
-      if (!R || screen !== 'step' || e.target.closest('input,textarea')) return;
+      const el = e.target;
+      if (!R || screen !== 'step' || e.ctrlKey || e.altKey || e.metaKey) return;
+      if (el && el.closest && el.closest('input,textarea,select')) return;
       if (e.key === 'ArrowRight') idx < R.st.length - 1 ? go('step', idx + 1) : go('done');
       if (e.key === 'ArrowLeft') idx ? go('step', idx - 1) : go('cover');
     });
