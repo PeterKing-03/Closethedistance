@@ -363,6 +363,32 @@ button.chip:hover { border-color: var(--mustard); }
 .tool-check .ui { width: 14px; height: 14px; }
 .tool-tile.on { border-color: var(--sage); background: #EEF6F0; }
 .tool-tile.on .tool-check { display: grid; }
+/* Đưa chuột vào dụng cụ đang chọn: dấu tích đổi thành ✕ đỏ, báo rằng bấm sẽ bỏ. */
+.tool-x {
+  position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent); color: #fff; border: 2px solid var(--outline);
+  display: none; place-items: center;
+}
+.tool-x .ui { width: 13px; height: 13px; }
+@media (hover: hover) {
+  .tool-tile.on:hover { border-color: var(--accent); background: #FFF1EC; }
+  .tool-tile.on:hover .tool-check { display: none; }
+  .tool-tile.on:hover .tool-x { display: grid; }
+}
+
+/* Dụng cụ trên hàng chọn chỗ làm: tên để chọn, ✕ để bỏ khỏi bếp. */
+.tool-chip {
+  display: inline-flex; align-items: stretch;
+  border-radius: 999px; border: 2px solid var(--line); background: #FFFCF8;
+  overflow: hidden;
+}
+.tool-chip.on { background: var(--mustard); border-color: var(--outline); }
+.tool-chip button { border: none; background: transparent; cursor: pointer; font-weight: 700; font-size: 15px; -webkit-tap-highlight-color: transparent; }
+.tool-chip-name { padding: 7px 4px 7px 14px; }
+.tool-chip-x { padding: 0 10px 0 6px; color: var(--muted); display: grid; place-items: center; }
+.tool-chip-x .ui { width: 14px; height: 14px; }
+.tool-chip-x:hover, .tool-chip-x:focus-visible { color: #fff; background: var(--accent); }
+.tool-chip:hover { border-color: var(--mustard); }
 .modal-foot.spread { justify-content: space-between; align-items: center; }
 .temp-input { width: 92px; padding: 6px 12px; border-radius: 999px; text-align: right; }
 

@@ -356,6 +356,28 @@
     return 0;
   }
 
+  function saveTools() {
+    store.set(TOOLS_KEY, state.k);
+    save();
+    renderBuilder();
+  }
+
+  function addTool(k) {
+    state.k = Kitchen.normalize(state.k.concat(k), state.st);
+    saveTools();
+  }
+
+  // Bỏ dụng cụ khỏi bếp. Không bỏ được nếu đang dùng trong một bước hoặc là dụng cụ cuối cùng.
+  function removeTool(k) {
+    const used = toolInUse(k);
+    if (used) { toast(t('tools.inUse', { tool: L.station(k), n: used })); return false; }
+    if (state.k.length <= 1) { toast(t('tools.min')); return false; }
+    state.k = state.k.filter((x) => x !== k);
+    saveTools();
+    toast(t('tools.removed', { tool: L.station(k) }));
+    return true;
+  }
+
   function openTools() {
     const m = modal(t('tools.title'), { wide: true });
     const tabs = h('div', { class: 'tabs', role: 'tablist' });
@@ -371,27 +393,20 @@
         const on = state.k.includes(k);
         grid.append(h('button', {
           class: 'icon-tile tool-tile' + (on ? ' on' : ''), type: 'button', 'aria-pressed': on ? 'true' : 'false',
+          title: on ? t('tools.remove', { tool: L.station(k) }) : L.station(k),
           onclick: () => toggleTool(k),
         },
           h('span', { class: 'tool-pic', html: Kitchen.toolSVG(k) }),
           h('span', { class: 'icon-name' }, L.station(k)),
-          h('span', { class: 'tool-check', html: ui('check') })));
+          h('span', { class: 'tool-check', html: ui('check') }),
+          h('span', { class: 'tool-x', html: ui('x') })));
       });
     }
 
     function toggleTool(k) {
-      if (state.k.includes(k)) {
-        const used = toolInUse(k);
-        if (used) { toast(t('tools.inUse', { tool: L.station(k), n: used })); return; }
-        if (state.k.length <= 1) { toast(t('tools.min')); return; }
-        state.k = state.k.filter((x) => x !== k);
-      } else {
-        state.k = Kitchen.normalize(state.k.concat(k), state.st);
-      }
-      store.set(TOOLS_KEY, state.k);
-      save();
+      if (state.k.includes(k)) removeTool(k);
+      else addTool(k);
       show();
-      renderBuilder();
     }
 
     Kitchen.CATS.forEach((c) => tabs.append(h('button', { class: 'tab', type: 'button', role: 'tab', 'data-k': c, onclick: () => { cur = c; show(); } }, L.toolCat(c))));
@@ -424,8 +439,11 @@
     box.innerHTML = '';
     renderScene();
 
+    // Mỗi dụng cụ: bấm tên để chọn chỗ làm, bấm ✕ để bỏ khỏi bếp.
     box.append(h('div', { class: 'chips station-chips' },
-      state.k.map((k) => chip(L.station(k), b.s === k, () => selectStation(k))),
+      state.k.map((k) => h('span', { class: 'tool-chip' + (b.s === k ? ' on' : '') },
+        h('button', { class: 'tool-chip-name', type: 'button', 'aria-pressed': b.s === k ? 'true' : 'false', onclick: () => selectStation(k) }, L.station(k)),
+        h('button', { class: 'tool-chip-x', type: 'button', 'aria-label': t('tools.remove', { tool: L.station(k) }), title: t('tools.remove', { tool: L.station(k) }), html: ui('x'), onclick: () => removeTool(k) }))),
       h('button', { class: 'chip chip-tools', type: 'button', onclick: openTools, html: ui('plus') + `<span>${t('tools.btn')}</span>` })));
 
     if (!b.s) return;
