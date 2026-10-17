@@ -5,7 +5,9 @@ Gửi yêu thương qua từng món ăn. Một website nhỏ cho các cặp đô
 ## Tính năng
 - Tạo nhân vật Chef (nam/nữ, da, tóc, mũ, tạp dề). Chef nghiêm túc nhắc nhở ở các bước cắt thái, chiên xào.
 - 35 icon nguyên liệu và bảng vẽ để tự vẽ nguyên liệu, định lượng theo g, ml, muỗng, quả...
-- Soạn từng bước trên giao diện căn bếp: thớt, tô, đĩa, chảo, nồi, mức lửa, thời gian, lời dặn.
+- Bộ 19 dụng cụ nhà bếp (sơ chế, nấu, làm bánh), tự chọn dụng cụ có trên bếp; căn bếp rộng ra theo số dụng cụ.
+- Soạn từng bước trên giao diện căn bếp: mức lửa, nhiệt độ lò (°C), thời gian, lời dặn.
+- Lời nhắn từ nhà sáng tạo hiện đầu tiên khi mở link.
 - Màn hình nấu cho điện thoại: checklist nguyên liệu, từng bước, hẹn giờ, giữ màn hình sáng.
 - Song ngữ Việt / Anh.
 

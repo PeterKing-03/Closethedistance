@@ -104,14 +104,15 @@
         h('span', { class: 'pill' }, t('cook.step', { a: idx + 1, b: n }))),
       h('div', { class: 'progress-bar' }, h('span', { style: `width:${((idx + 1) / n) * 100}%` })));
 
-    const scene = h('div', {
-      class: 'kitchen has-active',
-      html: Kitchen.scene({ active: step.s, heat: step.h, items: ings.map(graphic), chef: { c: R.c, mood: Chef.moodFor(step) } }),
+    const scene = C.kitchenView({
+      tools: R.k, active: step.s, heat: step.h, temp: step.d, items: ings.map(graphic),
+      chef: { c: R.c, mood: Chef.moodFor(step) },
     });
     const care = Chef.careFor(step);
 
     const meta = h('div', { class: 'chips static' }, h('span', { class: 'chip' }, L.station(step.s)));
     if (step.h) meta.append(h('span', { class: 'chip heat-' + step.h }, L.heat(step.h)));
+    if (step.d) meta.append(h('span', { class: 'chip heat-2' }, step.d + '°C'));
     if (step.t) meta.append(h('span', { class: 'chip' }, minutesLabel(step.t)));
 
     const body = h('section', { class: 'card step-card' },
@@ -271,7 +272,12 @@
       screen = ['cover', 'step', 'done'].includes(p.screen) ? p.screen : 'cover';
       if (screen === 'step') screen = 'cover'; // mở lại thì cho xem nguyên liệu trước, nút sẽ là "Nấu tiếp"
     }
-    render();
+    // Mở link: lời nhắn từ nhà sáng tạo hiện đầu tiên, bấm "Bắt đầu" mới vào recipe.
+    App.intro(root, () => {
+      root.className = 'cook';
+      shell();
+      render();
+    });
 
     document.addEventListener('keydown', (e) => {
       const el = e.target;

@@ -13,7 +13,28 @@
       </g></svg>`;
   }
 
-  window.App = { logo };
+  // Lời nhắn từ nhà sáng tạo: hiện đầu tiên, người dùng bấm "Bắt đầu" để vào.
+  function intro(root, onStart) {
+    const { h, ui, topbar } = C;
+    function render() {
+      root.className = 'intro-page';
+      root.innerHTML = '';
+      const start = h('button', { class: 'btn btn-primary btn-lg intro-start', type: 'button', onclick: () => { window.scrollTo(0, 0); onStart(); }, html: `<span>${L.t('intro.start')}</span>` + ui('right') });
+      root.append(
+        topbar(render),
+        h('main', { class: 'intro' },
+          h('section', { class: 'card intro-card' },
+            h('div', { class: 'intro-art', html: logo(92) + '<span class="intro-heart h1"></span><span class="intro-heart h2"></span><span class="intro-heart h3"></span>' }),
+            h('div', { class: 'intro-kicker' }, L.t('intro.title')),
+            h('p', { class: 'intro-body hand' }, L.t('intro.body')),
+            h('div', { class: 'intro-sign hand' }, '— Close the distance'),
+            start)));
+      start.focus({ preventScroll: true });
+    }
+    render();
+  }
+
+  window.App = { logo, intro };
 
   function route() {
     const root = document.getElementById('app');

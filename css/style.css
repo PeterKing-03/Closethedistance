@@ -25,6 +25,7 @@ body {
   color: var(--ink);
   font: 16px/1.5 var(--font);
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
 }
 body.no-scroll { overflow: hidden; }
 h1, h2, h3 { margin: 0; line-height: 1.25; font-weight: 800; }
@@ -295,13 +296,23 @@ button.chip:hover { border-color: var(--mustard); }
 .wb-size.on { border-color: var(--outline); background: var(--soft); }
 
 /* ---------- Căn bếp ---------- */
+/* Khung căn bếp: --sw là bề rộng căn bếp (tăng theo số dụng cụ), --kh là chiều cao tối đa.
+   Bếp rộng ra quá cột nội dung khi cần (tối đa 1180px, luôn nằm giữa màn hình).
+   Quá hẹp thì giữ kích thước dễ nhìn và cho vuốt ngang. */
 .kitchen {
-  border-radius: 18px; overflow: hidden;
+  --kh: 30vh;
+  --kw: min(calc(100vw - 40px), 1180px, calc(var(--kh) * var(--sw, 800) / 322));
+  width: var(--kw);
+  margin-inline: calc((100% - var(--kw)) / 2);
+  border-radius: 18px;
+  overflow-x: auto; overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
   border: 2px solid var(--outline);
   background: #FCEBDB;
   line-height: 0;
 }
-.kitchen-svg { width: 100%; height: auto; display: block; }
+.kitchen-svg { width: 100%; min-width: calc(var(--sw, 800) * 0.4px); height: auto; display: block; }
 .kitchen .station { transition: opacity .25s; transform-box: fill-box; transform-origin: 50% 100%; }
 .kitchen.has-active .station:not(.active) { opacity: .45; }
 .kitchen .station.active { animation: bob 1.8s ease-in-out infinite; }
@@ -330,13 +341,67 @@ button.chip:hover { border-color: var(--mustard); }
   background: var(--card);
   border-bottom: 2px solid var(--line);
 }
-.kitchen-sticky .kitchen { max-width: calc(30vh * 2.48); margin-inline: auto; }
 .scene-caption {
   margin-top: 6px; text-align: center; font-size: 14px; font-weight: 700; color: var(--muted);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .scene-caption.previewing { color: var(--accent-dark); }
 .builder { display: grid; gap: 14px; }
+
+/* Nút mở bảng dụng cụ và bảng chọn dụng cụ. */
+.chip-tools { border-style: dashed; border-color: var(--accent); color: var(--accent-dark); }
+.chip-tools .ui { width: 16px; height: 16px; }
+.tool-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+.tool-tile { padding-top: 12px; }
+.tool-pic { width: 70px; height: 70px; display: block; }
+.tool-icon { width: 100%; height: 100%; display: block; overflow: visible; }
+.tool-check {
+  position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--sage); color: #fff; border: 2px solid var(--outline);
+  display: none; place-items: center;
+}
+.tool-check .ui { width: 14px; height: 14px; }
+.tool-tile.on { border-color: var(--sage); background: #EEF6F0; }
+.tool-tile.on .tool-check { display: grid; }
+.modal-foot.spread { justify-content: space-between; align-items: center; }
+.temp-input { width: 92px; padding: 6px 12px; border-radius: 999px; text-align: right; }
+
+/* Lời nhắn từ nhà sáng tạo. */
+.intro { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; min-height: calc(100vh - 90px); display: grid; place-items: center; }
+.intro-card {
+  text-align: center; justify-items: center; gap: 18px;
+  padding: 34px 26px 30px;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    repeating-linear-gradient(45deg, var(--accent) 0 10px, #fff 10px 16px, var(--sage) 16px 26px, #fff 26px 32px) border-box;
+  border: 6px solid transparent;
+  animation: fade .5s ease-out both;
+}
+.intro-art { position: relative; width: 140px; height: 110px; display: grid; place-items: center; }
+.intro-art .logo { animation: bob 2s ease-in-out infinite; }
+.intro-heart {
+  position: absolute; width: 11px; height: 11px; background: var(--accent);
+  transform: rotate(45deg); animation: heart-up 3s ease-in infinite; opacity: 0;
+}
+.intro-heart::before, .intro-heart::after {
+  content: ''; position: absolute; width: 11px; height: 11px; border-radius: 50%; background: inherit;
+}
+.intro-heart::before { left: -5.5px; top: 0; }
+.intro-heart::after { left: 0; top: -5.5px; }
+.intro-heart.h1 { left: 14px; bottom: 20px; }
+.intro-heart.h2 { right: 16px; bottom: 34px; animation-delay: 1s; background: var(--mustard); }
+.intro-heart.h3 { left: 62px; bottom: 6px; animation-delay: 2s; background: var(--sage); }
+@keyframes heart-up {
+  0% { opacity: 0; transform: translateY(0) rotate(45deg) scale(.6); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-70px) rotate(45deg) scale(1.1); }
+}
+.intro-kicker { font-weight: 800; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-dark); }
+.intro-body { font-size: 1.12em; line-height: 1.85; margin: 0; text-wrap: pretty; }
+.intro-sign { color: var(--accent-dark); }
+.intro-start { min-width: 210px; margin-top: 6px; }
+.creator-link { margin: 4px auto 0; color: var(--accent-dark); }
+.creator-link .ui { width: 16px; height: 16px; }
 .station-chips { justify-content: center; }
 .step-panel {
   display: grid; gap: 16px;
@@ -458,7 +523,7 @@ button.chip:hover { border-color: var(--mustard); }
   background: var(--bg);
   box-shadow: 0 10px 12px -12px rgba(74, 59, 54, .35);
 }
-.cook-stage .kitchen { width: 100%; max-width: calc(32vh * 2.48); margin-inline: auto; }
+.cook-stage .kitchen { --kh: 34vh; }
 .step-card { text-align: center; justify-items: center; gap: 10px; }
 .step-action { font-size: clamp(24px, 6vw, 32px); }
 .step-ings { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; }

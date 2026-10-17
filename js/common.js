@@ -103,9 +103,14 @@
       step.h = S.heat ? Math.max(0, Math.min(3, x.h | 0)) : 0;
       const t = Number(x.t);
       step.t = isFinite(t) && t > 0 ? Math.min(600, Math.round(t * 2) / 2) : 0;
+      // Nhiệt độ (°C) cho lò nướng, nồi chiên không dầu.
+      const d = Math.round(Number(x.d));
+      step.d = S.temp && isFinite(d) && d >= 30 ? Math.min(300, d) : 0;
       step.n = str(x.n, 400);
       r.st.push(step);
     });
+    // Dụng cụ trên bếp (link cũ không có thì dùng bộ mặc định), luôn gồm dụng cụ dùng trong các bước.
+    r.k = Kitchen.normalize(raw.k, r.st);
     return r;
   }
 
@@ -134,6 +139,23 @@
 
   function stepIngredients(step, ings) {
     return (step.g || []).map((n) => ings[n]).filter(Boolean);
+  }
+
+  // Căn bếp trong khung: bề rộng tự co giãn theo số dụng cụ, cuộn ngang khi quá hẹp,
+  // và tự cuộn tới dụng cụ đang dùng.
+  function kitchenView(opts, cls = '') {
+    const sc = Kitchen.scene(opts);
+    const el = h('div', {
+      class: 'kitchen' + (opts.active ? ' has-active' : '') + (opts.interactive ? ' interactive' : '') + (cls ? ' ' + cls : ''),
+      style: `--sw:${sc.w}`,
+      html: sc.svg,
+    });
+    requestAnimationFrame(() => {
+      if (el.scrollWidth > el.clientWidth + 2) {
+        el.scrollLeft = (sc.focus / sc.w) * el.scrollWidth - el.clientWidth / 2;
+      }
+    });
+    return el;
   }
 
   function minutesLabel(t) {
@@ -214,5 +236,5 @@
     return { el, body, close };
   }
 
-  window.C = { h, ui, graphic, ingSVG, sanitize, actionLabel, ingName, amountLabel, stepIngredients, minutesLabel, langToggle, topbar, store, toast, modal };
+  window.C = { h, ui, graphic, ingSVG, sanitize, actionLabel, ingName, amountLabel, stepIngredients, minutesLabel, kitchenView, langToggle, topbar, store, toast, modal };
 })();

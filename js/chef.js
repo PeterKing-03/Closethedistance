@@ -22,19 +22,18 @@
     });
   }
 
-  // Cắt thái, chiên xào, lửa lớn: Chef nghiêm túc nhắc nhở.
-  function moodFor(step) {
-    if (!step || !step.s) return 'happy';
-    if (step.s === 'thot') return 'serious';
-    if (step.s === 'chao' && step.a && step.a !== 'nem') return 'serious';
-    if (step.h === 3) return 'serious';
-    return 'happy';
+  // Cắt thái, chiên xào, lò nướng, nồi chiên, máy xay, lửa lớn: Chef nghiêm túc nhắc nhở.
+  const CARE_TOOLS = { thot: 'care.thot', chao: 'care.chao', lo_nuong: 'care.oven', noi_chien: 'care.oven', may_xay: 'care.blender' };
+  function careKey(step) {
+    if (!step || !step.s) return '';
+    if (step.s === 'chao' && (!step.a || step.a === 'nem')) return step.h === 3 ? 'care.heat' : '';
+    if (Object.prototype.hasOwnProperty.call(CARE_TOOLS, step.s)) return CARE_TOOLS[step.s];
+    return step.h === 3 ? 'care.heat' : '';
   }
+  function moodFor(step) { return careKey(step) ? 'serious' : 'happy'; }
   function careFor(step) {
-    if (moodFor(step) !== 'serious') return '';
-    if (step.s === 'thot') return L.t('care.thot');
-    if (step.s === 'chao') return L.t('care.chao');
-    return L.t('care.heat');
+    const k = careKey(step);
+    return k ? L.t(k) : '';
   }
 
   function face(mood, female) {

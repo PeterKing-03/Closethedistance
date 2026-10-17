@@ -11,9 +11,12 @@
   const MAX_STEPS = 50;
   const S = Kitchen.STATIONS;
 
+  const TOOLS_KEY = 'ctd-tools-v1';
+  const INTRO_KEY = 'ctd-intro-seen-v1';
   const savedChef = () => Chef.sanitize(store.get(CHEF_KEY, null));
-  const blank = () => ({ t: '', to: '', f: '', m: '', e: '', c: savedChef(), i: [], st: [] });
-  const blankStep = () => ({ s: null, a: '', g: [], h: 0, t: '', n: '' });
+  const savedTools = () => Kitchen.normalize(store.get(TOOLS_KEY, null));
+  const blank = () => ({ t: '', to: '', f: '', m: '', e: '', c: savedChef(), k: savedTools(), i: [], st: [] });
+  const blankStep = () => ({ s: null, a: '', g: [], h: 0, d: 0, t: '', n: '' });
 
   let state = blank();
   let builder = blankStep();
@@ -35,6 +38,7 @@
       const r = C.sanitize(d);
       if (!d.t) r.t = '';
       if (!d.c) r.c = savedChef();
+      if (!d.k) r.k = Kitchen.normalize(savedTools(), r.st);
       return r;
     } catch (e) { return blank(); }
   }
@@ -335,15 +339,67 @@
     }
     els.scene.innerHTML = '';
     els.scene.append(
-      h('div', {
-        class: 'kitchen interactive' + (step ? ' has-active' : ''),
-        html: Kitchen.scene({
-          active: step ? step.s : null, heat: step ? step.h : 0,
-          items: step ? step.g.map((n) => graphic(state.i[n])) : [], interactive: true,
-          chef: { c: state.c, mood: Chef.moodFor(step) },
-        }),
+      C.kitchenView({
+        tools: state.k,
+        active: step ? step.s : null, heat: step ? step.h : 0, temp: step ? step.d : 0,
+        items: step ? step.g.map((n) => graphic(state.i[n])) : [], interactive: true,
+        chef: { c: state.c, mood: Chef.moodFor(step) },
       }),
       h('div', { class: 'scene-caption' + (viewing != null ? ' previewing' : '') }, caption));
+  }
+
+  // ---------- Bộ dụng cụ trong bếp ----------
+  function toolInUse(key) {
+    const i = state.st.findIndex((s) => s.s === key);
+    if (i >= 0) return i + 1;
+    if (builder.s === key) return editing != null ? editing + 1 : state.st.length + 1;
+    return 0;
+  }
+
+  function openTools() {
+    const m = modal(t('tools.title'), { wide: true });
+    const tabs = h('div', { class: 'tabs', role: 'tablist' });
+    const grid = h('div', { class: 'icon-grid tool-grid' });
+    const count = h('span', { class: 'pill' });
+    let cur = 'prep';
+
+    function show() {
+      [...tabs.children].forEach((b) => b.classList.toggle('on', b.dataset.k === cur));
+      count.textContent = t('tools.count', { n: state.k.length });
+      grid.innerHTML = '';
+      Kitchen.ORDER.filter((k) => Kitchen.TOOLS[k].cat === cur).forEach((k) => {
+        const on = state.k.includes(k);
+        grid.append(h('button', {
+          class: 'icon-tile tool-tile' + (on ? ' on' : ''), type: 'button', 'aria-pressed': on ? 'true' : 'false',
+          onclick: () => toggleTool(k),
+        },
+          h('span', { class: 'tool-pic', html: Kitchen.toolSVG(k) }),
+          h('span', { class: 'icon-name' }, L.station(k)),
+          h('span', { class: 'tool-check', html: ui('check') })));
+      });
+    }
+
+    function toggleTool(k) {
+      if (state.k.includes(k)) {
+        const used = toolInUse(k);
+        if (used) { toast(t('tools.inUse', { tool: L.station(k), n: used })); return; }
+        if (state.k.length <= 1) { toast(t('tools.min')); return; }
+        state.k = state.k.filter((x) => x !== k);
+      } else {
+        state.k = Kitchen.normalize(state.k.concat(k), state.st);
+      }
+      store.set(TOOLS_KEY, state.k);
+      save();
+      show();
+      renderBuilder();
+    }
+
+    Kitchen.CATS.forEach((c) => tabs.append(h('button', { class: 'tab', type: 'button', role: 'tab', 'data-k': c, onclick: () => { cur = c; show(); } }, L.toolCat(c))));
+    m.body.append(
+      h('p', { class: 'muted small' }, t('tools.hint')),
+      tabs, grid,
+      h('div', { class: 'modal-foot spread' }, count, h('button', { class: 'btn btn-primary', type: 'button', onclick: m.close }, t('picker.done'))));
+    show();
   }
 
   function togglePreview(idx) {
@@ -356,8 +412,9 @@
     if (!S[key]) return;
     viewing = null;
     builder.s = key;
-    if (!S[key].actions[builder.a]) builder.a = '';
-    builder.h = S[key].heat ? (builder.h || 2) : 0;
+    if (!Object.prototype.hasOwnProperty.call(S[key].actions, builder.a)) builder.a = '';
+    builder.h = S[key].stove ? (builder.h || 2) : 0;
+    builder.d = S[key].temp ? (builder.d || 180) : 0;
     renderBuilder();
   }
 
@@ -368,7 +425,8 @@
     renderScene();
 
     box.append(h('div', { class: 'chips station-chips' },
-      Object.keys(S).map((k) => chip(L.station(k), b.s === k, () => selectStation(k)))));
+      state.k.map((k) => chip(L.station(k), b.s === k, () => selectStation(k))),
+      h('button', { class: 'chip chip-tools', type: 'button', onclick: openTools, html: ui('plus') + `<span>${t('tools.btn')}</span>` })));
 
     if (!b.s) return;
 
@@ -391,9 +449,16 @@
       : h('p', { class: 'hint' }, t('builder.noIng'));
     panel.append(h('div', { class: 'group' }, h('span', { class: 'field-label' }, t('builder.with')), ingChips));
 
-    if (st.heat) {
+    if (st.stove) {
       panel.append(h('div', { class: 'group' }, h('span', { class: 'field-label' }, t('builder.heat')),
         h('div', { class: 'chips' }, [1, 2, 3, 0].map((lv) => chip(L.heat(lv), b.h === lv, () => { b.h = lv; renderBuilder(); })))));
+    }
+    if (st.temp) {
+      const temp = h('input', { type: 'number', min: 30, max: 300, step: 5, inputmode: 'numeric', value: b.d || '', class: 'temp-input', 'aria-label': t('builder.temp') });
+      temp.addEventListener('input', () => { b.d = Math.max(0, Math.min(300, Math.round(Number(temp.value) || 0))); });
+      temp.addEventListener('change', renderScene);
+      panel.append(h('div', { class: 'group' }, h('span', { class: 'field-label' }, t('builder.temp')),
+        h('div', { class: 'chips' }, temp, [150, 160, 170, 180, 200].map((v) => chip(v + '°C', b.d === v, () => { b.d = v; renderBuilder(); })))));
     }
 
     const time = h('input', { type: 'number', min: 0, max: 600, step: 0.5, inputmode: 'decimal', value: b.t, placeholder: '0' });
@@ -425,7 +490,8 @@
     if (!b.a) { toast(t('toast.pickAction')); return; }
     if (editing == null && state.st.length >= MAX_STEPS) { toast(t('limit.step', { n: MAX_STEPS })); return; }
     const tm = Math.max(0, Math.min(600, Number(b.t) || 0));
-    const step = { s: b.s, a: b.a, g: b.g.slice(), h: b.h, t: Math.round(tm * 2) / 2, n: (b.n || '').trim() };
+    const d = S[b.s].temp && b.d >= 30 ? Math.min(300, b.d) : 0;
+    const step = { s: b.s, a: b.a, g: b.g.slice(), h: b.h, d, t: Math.round(tm * 2) / 2, n: (b.n || '').trim() };
     if (editing != null) {
       state.st[editing] = step;
       toast(t('toast.stepSaved', { n: editing + 1 }));
@@ -460,6 +526,7 @@
       const ings = C.stepIngredients(step, state.i);
       const meta = [L.station(step.s)];
       if (step.h) meta.push(L.heat(step.h));
+      if (step.d) meta.push(step.d + '°C');
       if (step.t) meta.push(minutesLabel(step.t));
       list.append(h('li', { class: 'step-item' + (editing === idx ? ' editing' : '') + (viewing === idx ? ' previewing' : '') },
         h('span', { class: 'step-num' }, String(idx + 1)),
@@ -503,7 +570,7 @@
   }
   function editStep(idx) {
     const s = state.st[idx];
-    builder = { s: s.s, a: s.a, g: s.g.slice(), h: s.h, t: s.t || '', n: s.n || '' };
+    builder = { s: s.s, a: s.a, g: s.g.slice(), h: s.h, d: s.d || 0, t: s.t || '', n: s.n || '' };
     editing = idx;
     viewing = null;
     renderBuilder();
@@ -519,7 +586,7 @@
   }
 
   function payload() {
-    const p = { v: 1, t: state.t.trim(), c: state.c };
+    const p = { v: 1, t: state.t.trim(), c: state.c, k: state.k };
     ['to', 'f', 'm', 'e'].forEach((k) => { if (state[k].trim()) p[k] = state[k].trim(); });
     p.i = state.i.map((ing) => {
       const o = {};
@@ -536,6 +603,7 @@
       const o = { s: s.s, a: s.a };
       if (s.g.length) o.g = s.g;
       if (s.h) o.h = s.h;
+      if (s.d) o.d = s.d;
       if (s.t) o.t = s.t;
       if (s.n) o.n = s.n;
       return o;
@@ -638,7 +706,9 @@
         infoSection(),
         ingredientSection(),
         kitchenSection(),
-        endSection()),
+        endSection(),
+        h('p', { class: 'center small' },
+          h('button', { class: 'link-btn creator-link', type: 'button', onclick: showIntro, html: ui('heart') + `<span>${t('intro.reopen')}</span>` }))),
       h('div', { class: 'actionbar' },
         h('div', { class: 'actionbar-inner' },
           h('button', { class: 'btn btn-ghost', type: 'button', onclick: preview, html: ui('eye') + `<span>${t('btn.preview')}</span>` }),
@@ -650,12 +720,25 @@
     renderSteps();
   }
 
+  // Mở lại lời nhắn từ nhà sáng tạo; bấm "Bắt đầu" thì quay về đúng chỗ đang soạn.
+  function showIntro() {
+    clearTimeout(saveTimer);
+    store.set(DRAFT_KEY, state);
+    App.intro(els.root, build);
+  }
+
   function mount(root) {
     state = loadDraft();
     builder = blankStep();
     editing = null;
     viewing = null;
     els = { root };
+    // Lần đầu ghé trang soạn: hiện lời nhắn từ nhà sáng tạo trước.
+    if (!store.get(INTRO_KEY, false)) {
+      store.set(INTRO_KEY, true);
+      App.intro(root, build);
+      return;
+    }
     build();
   }
 
