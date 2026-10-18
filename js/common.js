@@ -100,7 +100,8 @@
       if (!S || !Object.prototype.hasOwnProperty.call(Kitchen.STATIONS, x.s)) return;
       const step = { s: x.s, a: Object.prototype.hasOwnProperty.call(S.actions, x.a) ? x.a : '' };
       step.g = [...new Set((Array.isArray(x.g) ? x.g : []).map((n) => n | 0))].filter((n) => n >= 0 && n < r.i.length);
-      step.h = S.heat ? Math.max(0, Math.min(3, x.h | 0)) : 0;
+      // Mức lửa chỉ áp dụng cho dụng cụ đặt trên bếp ga (chảo, nồi, xửng hấp, ấm).
+      step.h = S.stove ? Math.max(0, Math.min(3, x.h | 0)) : 0;
       const t = Number(x.t);
       step.t = isFinite(t) && t > 0 ? Math.min(600, Math.round(t * 2) / 2) : 0;
       // Nhiệt độ (°C) cho lò nướng, nồi chiên không dầu.

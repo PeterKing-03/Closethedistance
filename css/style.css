@@ -341,9 +341,10 @@ button.chip:hover { border-color: var(--mustard); }
   background: var(--card);
   border-bottom: 2px solid var(--line);
 }
+.kitchen-sticky { min-width: 0; }
 .scene-caption {
   margin-top: 6px; text-align: center; font-size: 14px; font-weight: 700; color: var(--muted);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 .scene-caption.previewing { color: var(--accent-dark); }
 .builder { display: grid; gap: 14px; }
@@ -619,6 +620,15 @@ button.chip:hover { border-color: var(--mustard); }
   .chef-maker { grid-template-columns: 1fr; }
   .chef-stage { position: static; }
   .chef-preview { width: 120px; height: 176px; }
+}
+
+/* Điện thoại rất hẹp (~360px): thu gọn tên thương hiệu và nút ở thanh dưới để không xuống dòng. */
+@media (max-width: 380px) {
+  .brand { gap: 8px; }
+  .brand .logo { width: 32px; height: 32px; }
+  .brand-name { font-size: 15px; white-space: nowrap; }
+  .actionbar-inner .btn { padding: 12px 8px; font-size: 14px; gap: 6px; white-space: nowrap; }
+  .actionbar-inner .btn .ui { width: 17px; height: 17px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
