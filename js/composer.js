@@ -16,7 +16,8 @@
   const savedChef = () => Chef.sanitize(store.get(CHEF_KEY, null));
   const savedTools = () => Kitchen.normalize(store.get(TOOLS_KEY, null));
   const blank = () => ({ t: '', to: '', f: '', m: '', e: '', c: savedChef(), k: savedTools(), i: [], st: [] });
-  const blankStep = () => ({ s: null, a: '', g: [], h: 0, d: 0, t: '', n: '' });
+  // p: thành phẩm của các bước trước dùng trong bước này; o: tên thành phẩm của bước này.
+  const blankStep = () => ({ s: null, a: '', g: [], p: [], h: 0, d: 0, t: '', n: '', o: '' });
 
   let state = blank();
   let builder = blankStep();
@@ -174,6 +175,8 @@
     nuoc_mam: 'tbsp', nuoc_tuong: 'tbsp', dau_an: 'tbsp',
     muoi: 'tsp', duong: 'tsp', tieu: 'tsp', hat_nem: 'tsp',
     sua: 'ml', nuoc: 'ml', gao: 'cup',
+    long_do: 'qua', long_trang: 'qua', kem_tuoi: 'ml', banh_quy: 'mieng', ca_phe: 'ml',
+    cacao: 'tbsp', men_no: 'tsp', vani: 'tsp',
   };
 
   // Ô nhập số + menu chọn đơn vị (g, kg, ml, muỗng canh, quả...).
@@ -342,7 +345,7 @@
       C.kitchenView({
         tools: state.k,
         active: step ? step.s : null, heat: step ? step.h : 0, temp: step ? step.d : 0,
-        items: step ? step.g.map((n) => graphic(state.i[n])) : [], interactive: true,
+        items: step ? C.stepGraphics(step, state.st, state.i) : [], interactive: true,
         chef: { c: state.c, mood: Chef.moodFor(step) },
       }),
       h('div', { class: 'scene-caption' + (viewing != null ? ' previewing' : '') }, caption));
@@ -454,6 +457,9 @@
     panel.append(h('div', { class: 'group' }, h('span', { class: 'field-label' }, t('builder.what')),
       h('div', { class: 'chips' }, Object.keys(st.actions).map((k) => chip(L.action(k, b.s), b.a === k, () => { b.a = k; renderBuilder(); })))));
 
+    // Bước đang soạn nằm ở vị trí nào: chỉ được lấy thành phẩm của các bước đứng trước nó.
+    const here = editing != null ? editing : state.st.length;
+    const usedAt = (n) => state.st.map((s, i) => (i !== editing && s.g.includes(n) ? L.t('step.short', { n: i + 1 }) : null)).filter(Boolean);
     const ingChips = state.i.length
       ? h('div', { class: 'chips' }, state.i.map((ing, n) => {
         const on = b.g.includes(n);
@@ -461,11 +467,27 @@
           b.g = on ? b.g.filter((x) => x !== n) : b.g.concat(n);
           renderBuilder();
         }, { class: 'chip chip-ing' + (on ? ' on' : '') });
-        c.append(h('span', { html: ingSVG(ing) }), h('span', {}, ingName(ing)));
+        const used = usedAt(n);
+        c.append(h('span', { html: ingSVG(ing) }), h('span', {}, ingName(ing)),
+          used.length ? h('span', { class: 'chip-sub' }, t('builder.usedIn', { list: used.join(', ') })) : null);
         return c;
       }))
       : h('p', { class: 'hint' }, t('builder.noIng'));
-    panel.append(h('div', { class: 'group' }, h('span', { class: 'field-label' }, t('builder.with')), ingChips));
+    const prevChips = here > 0
+      ? h('div', { class: 'chips' }, state.st.slice(0, here).map((s, j) => {
+        const on = b.p.includes(j);
+        const c = chip('', on, () => {
+          b.p = on ? b.p.filter((x) => x !== j) : b.p.concat(j).sort((x, y) => x - y);
+          renderBuilder();
+        }, { class: 'chip chip-ing chip-out' + (on ? ' on' : '') });
+        c.append(h('span', { html: C.outSVG(state.st, j, state.i) }), h('span', {}, C.outName(state.st, j)),
+          h('span', { class: 'chip-sub' }, L.t('step.short', { n: j + 1 })));
+        return c;
+      }))
+      : null;
+    panel.append(h('div', { class: 'group' }, h('span', { class: 'field-label' }, t('builder.with')),
+      prevChips ? h('span', { class: 'group-sub' }, t('builder.raw')) : null, ingChips,
+      prevChips ? h('span', { class: 'group-sub' }, t('builder.prev')) : null, prevChips));
 
     if (st.stove) {
       panel.append(h('div', { class: 'group' }, h('span', { class: 'field-label' }, t('builder.heat')),
@@ -483,9 +505,12 @@
     time.addEventListener('input', () => { b.t = time.value; });
     const note = h('textarea', { rows: 2, maxlength: 400, class: 'hand', value: b.n, placeholder: t('builder.notePh') });
     note.addEventListener('input', () => { b.n = note.value; });
+    const outName = h('input', { type: 'text', maxlength: 40, value: b.o, placeholder: t('out.default', { n: here + 1 }) });
+    outName.addEventListener('input', () => { b.o = outName.value; });
     panel.append(
       h('div', { class: 'row-time' }, field(t('builder.time'), time, t('builder.timeHint'))),
-      field(t('builder.note'), note));
+      field(t('builder.note'), note),
+      field(t('builder.outName'), outName, t('builder.outHint')));
 
     const label = b.a ? stepTitle(b) : t('builder.pickAction');
     panel.append(h('div', { class: 'preview-line' }, h('span', { class: 'muted' }, t('builder.preview')), h('strong', {}, label)));
@@ -499,8 +524,7 @@
   }
 
   function stepTitle(step) {
-    const names = C.stepIngredients(step, state.i).map(ingName).filter(Boolean);
-    return actionLabel(step) + (names.length ? ': ' + names.join(', ') : '');
+    return C.stepTitle(step, state.st, state.i);
   }
 
   function commitStep() {
@@ -509,7 +533,11 @@
     if (editing == null && state.st.length >= MAX_STEPS) { toast(t('limit.step', { n: MAX_STEPS })); return; }
     const tm = Math.max(0, Math.min(600, Number(b.t) || 0));
     const d = S[b.s].temp && b.d >= 30 ? Math.min(300, b.d) : 0;
-    const step = { s: b.s, a: b.a, g: b.g.slice(), h: b.h, d, t: Math.round(tm * 2) / 2, n: (b.n || '').trim() };
+    const here = editing != null ? editing : state.st.length;
+    const step = {
+      s: b.s, a: b.a, g: b.g.slice(), p: b.p.filter((j) => j < here), h: b.h, d,
+      t: Math.round(tm * 2) / 2, n: (b.n || '').trim(), o: (b.o || '').trim().slice(0, 40),
+    };
     if (editing != null) {
       state.st[editing] = step;
       toast(t('toast.stepSaved', { n: editing + 1 }));
@@ -546,6 +574,12 @@
       if (step.h) meta.push(L.heat(step.h));
       if (step.d) meta.push(step.d + '°C');
       if (step.t) meta.push(minutesLabel(step.t));
+      // Liên kết: dùng thành phẩm bước nào, và thành phẩm của bước này được dùng ở đâu.
+      const uses = (step.p || []).map((j) => `${C.outName(state.st, j)} (${L.t('step.short', { n: j + 1 })})`);
+      const later = C.usedBy(state.st, idx);
+      const makes = step.o || later.length
+        ? t('steps.makes', { name: C.outName(state.st, idx) }) + (later.length ? ' → ' + later.map((i) => L.t('step.short', { n: i + 1 })).join(', ') : '')
+        : '';
       list.append(h('li', { class: 'step-item' + (editing === idx ? ' editing' : '') + (viewing === idx ? ' previewing' : '') },
         h('span', { class: 'step-num' }, String(idx + 1)),
         h('div', {
@@ -556,7 +590,9 @@
         },
           h('div', { class: 'step-title' }, stepTitle(step)),
           h('div', { class: 'step-meta' }, meta.join(' · ')),
-          ings.length ? h('div', { class: 'step-icons', html: ings.map((x) => ingSVG(x)).join('') }) : null,
+          ings.length || uses.length ? h('div', { class: 'step-icons', html: ings.map((x) => ingSVG(x)).join('') + (step.p || []).map((j) => C.outSVG(state.st, j, state.i)).join('') }) : null,
+          uses.length ? h('div', { class: 'step-link uses' }, '← ' + t('steps.uses', { list: uses.join(', ') })) : null,
+          makes ? h('div', { class: 'step-link makes' }, '→ ' + makes) : null,
           step.n ? h('div', { class: 'step-note hand' }, step.n) : null),
         h('div', { class: 'step-tools' },
           h('button', { class: 'icon-btn', type: 'button', 'aria-label': t('steps.up'), disabled: idx === 0, html: ui('up'), onclick: () => moveStep(idx, -1) }),
@@ -566,10 +602,19 @@
     });
   }
 
+  // Đổi chỗ hai bước liền kề. Bước sau dùng thành phẩm của bước trước thì không đổi được.
   function moveStep(idx, d) {
     const j = idx + d;
     if (j < 0 || j >= state.st.length) return;
+    const [first, second] = idx < j ? [idx, j] : [j, idx];
+    if ((state.st[second].p || []).includes(first)) {
+      toast(t('flow.moveBlocked', { a: second + 1, b: first + 1 }));
+      return;
+    }
     [state.st[idx], state.st[j]] = [state.st[j], state.st[idx]];
+    // Cập nhật các liên kết trỏ tới hai bước vừa đổi chỗ.
+    const swap = (n) => (n === idx ? j : n === j ? idx : n);
+    state.st.forEach((s) => { s.p = (s.p || []).map(swap).sort((x, y) => x - y); });
     if (viewing === idx) viewing = j;
     else if (viewing === j) viewing = idx;
     if (editing != null) cancelStep();
@@ -578,7 +623,10 @@
     renderSteps();
   }
   function deleteStep(idx) {
+    const users = C.usedBy(state.st, idx);
+    if (users.length) { toast(t('flow.deleteBlocked', { a: users[0] + 1 })); return; }
     state.st.splice(idx, 1);
+    state.st.forEach((s) => { s.p = (s.p || []).map((n) => (n > idx ? n - 1 : n)); });
     if (viewing === idx) viewing = null;
     else if (viewing > idx) viewing--;
     if (editing != null) cancelStep();
@@ -588,7 +636,7 @@
   }
   function editStep(idx) {
     const s = state.st[idx];
-    builder = { s: s.s, a: s.a, g: s.g.slice(), h: s.h, d: s.d || 0, t: s.t || '', n: s.n || '' };
+    builder = { s: s.s, a: s.a, g: s.g.slice(), p: (s.p || []).slice(), h: s.h, d: s.d || 0, t: s.t || '', n: s.n || '', o: s.o || '' };
     editing = idx;
     viewing = null;
     renderBuilder();
@@ -624,12 +672,15 @@
       if (s.d) o.d = s.d;
       if (s.t) o.t = s.t;
       if (s.n) o.n = s.n;
+      if (s.p && s.p.length) o.p = s.p;
+      if (s.o) o.o = s.o;
       return o;
     });
     return p;
   }
 
-  function check() {
+  // warnUnused: trước khi gửi, nhắc nếu còn nguyên liệu chưa dùng ở bước nào.
+  function check(warnUnused) {
     if (!state.t.trim()) {
       toast(t('check.title'));
       const f = document.getElementById('f-title');
@@ -638,6 +689,10 @@
     }
     if (!state.i.length) { toast(t('check.ing')); return false; }
     if (!state.st.length) { toast(t('check.step')); return false; }
+    if (warnUnused) {
+      const unused = state.i.filter((ing, n) => !state.st.some((s) => s.g.includes(n))).map(ingName);
+      if (unused.length && !confirm(t('check.unused', { list: unused.join(', ') }))) return false;
+    }
     return true;
   }
 
@@ -661,7 +716,7 @@
   }
 
   async function share() {
-    if (!check()) return;
+    if (!check(true)) return;
     const url = await makeLink();
     const m = modal(t('share.title'));
     const who = state.to.trim() || t('share.whoDefault');

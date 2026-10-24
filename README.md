@@ -7,6 +7,7 @@ Gửi yêu thương qua từng món ăn. Một website nhỏ cho các cặp đô
 - 35 icon nguyên liệu và bảng vẽ để tự vẽ nguyên liệu, định lượng theo g, ml, muỗng, quả...
 - Bộ 19 dụng cụ nhà bếp (sơ chế, nấu, làm bánh), tự chọn dụng cụ có trên bếp; căn bếp rộng ra theo số dụng cụ.
 - Soạn từng bước trên giao diện căn bếp: mức lửa, nhiệt độ lò (°C), thời gian, lời dặn.
+- Liên kết giữa các bước: thành phẩm của một bước (VD "Kem mascarpone") làm nguyên liệu cho bước sau; người nhận có sơ đồ tổng quan các bước và xem lại nhanh được bước trước.
 - Lời nhắn từ nhà sáng tạo hiện đầu tiên khi mở link.
 - Màn hình nấu cho điện thoại: checklist nguyên liệu, từng bước, hẹn giờ, giữ màn hình sáng.
 - Song ngữ Việt / Anh.

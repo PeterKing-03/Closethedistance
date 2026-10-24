@@ -89,8 +89,53 @@
         h('div', { class: 'card-head spread' }, h('h2', {}, t('cook.prep')), counter),
         h('p', { class: 'muted' }, t('cook.tapHint')),
         list),
+      flowCard(),
       h('div', { class: 'cook-nav single' },
         h('button', { class: 'btn btn-primary btn-lg', type: 'button', onclick: () => go('step', idx || 0), html: `<span>${idx ? t('cook.resume', { n: idx + 1 }) : t('cook.start')}</span>` + ui('right') })));
+  }
+
+  // Tổng quan các bước: mỗi bước một dòng, có mũi tên ← chỉ thành phẩm lấy từ bước trước
+  // và → chỉ thành phẩm của bước này được dùng ở đâu. Bấm vào một bước để xem lại.
+  function flowCard() {
+    if (R.st.length < 2) return null;
+    const linked = R.st.some((s) => (s.p || []).length);
+    const list = h('ol', { class: 'flow' }, R.st.map((s, i) => {
+      const later = C.usedBy(R.st, i);
+      return h('li', { class: 'flow-row' + ((s.p || []).length ? ' merge' : '') },
+        h('span', { class: 'flow-num' }, String(i + 1)),
+        h('button', { class: 'flow-body', type: 'button', onclick: () => peek(i) },
+          h('span', { class: 'flow-title' }, C.stepTitle(s, R.st, R.i)),
+          (s.p || []).length ? h('span', { class: 'flow-tags' }, (s.p || []).map((j) =>
+            h('span', { class: 'flow-tag in' }, '← ', h('span', { html: C.outSVG(R.st, j, R.i) }), C.outName(R.st, j), ' · ', L.t('step.short', { n: j + 1 })))) : null,
+          later.length ? h('span', { class: 'flow-tag out' }, '→ ' + C.outName(R.st, i) + ' · ' + t('cook.usedLater', { list: later.map((x) => x + 1).join(', ') })) : null));
+    }));
+    return h('section', { class: 'card' },
+      h('div', { class: 'card-head' }, h('h2', {}, t('cook.flow'))),
+      linked ? h('p', { class: 'muted small' }, t('cook.flowHint')) : null,
+      list);
+  }
+
+  // Xem nhanh lại một bước trong hộp thoại, không rời khỏi bước đang nấu.
+  function peek(i) {
+    const s = R.st[i];
+    if (!s) return;
+    const m = C.modal(t('cook.peekTitle', { n: i + 1 }));
+    const ings = C.stepIngredients(s, R.i);
+    const meta = [L.station(s.s)];
+    if (s.h) meta.push(L.heat(s.h));
+    if (s.d) meta.push(s.d + '°C');
+    if (s.t) meta.push(minutesLabel(s.t));
+    // Bọc trong h() để các phần trống (null) được bỏ qua, không hiện thành chữ "null".
+    m.body.append(h('div', { class: 'modal-body' },
+      h('div', { class: 'peek-scene' }, C.kitchenView({ tools: R.k, active: s.s, heat: s.h, temp: s.d, items: C.stepGraphics(s, R.st, R.i), chef: { c: R.c, mood: Chef.moodFor(s) } })),
+      h('h3', { class: 'peek-title' }, actionLabel(s)),
+      h('p', { class: 'muted' }, meta.join(' · ')),
+      ings.length ? h('ul', { class: 'step-ings left' }, ings.map((ing) =>
+        h('li', {}, h('span', { html: ingSVG(ing) }), h('span', {}, h('strong', {}, ingName(ing)), C.amountLabel(ing) ? h('span', { class: 'muted' }, ' · ' + C.amountLabel(ing)) : null)))) : null,
+      (s.p || []).length ? h('ul', { class: 'step-ings left' }, s.p.map((j) =>
+        h('li', {}, h('span', { html: C.outSVG(R.st, j, R.i) }), h('span', {}, h('strong', {}, C.outName(R.st, j)), h('span', { class: 'muted' }, ' · ' + t('cook.fromStep', { n: j + 1 })))))) : null,
+      s.n ? h('div', { class: 'note' }, h('div', { class: 'note-from' }, t('cook.says', { chef: from() })), h('p', { class: 'hand' }, s.n)) : null,
+      h('div', { class: 'modal-foot' }, h('button', { class: 'btn btn-primary', type: 'button', onclick: m.close }, t('picker.done')))));
   }
 
   function renderStep() {
@@ -105,7 +150,7 @@
       h('div', { class: 'progress-bar' }, h('span', { style: `width:${((idx + 1) / n) * 100}%` })));
 
     const scene = C.kitchenView({
-      tools: R.k, active: step.s, heat: step.h, temp: step.d, items: ings.map(graphic),
+      tools: R.k, active: step.s, heat: step.h, temp: step.d, items: C.stepGraphics(step, R.st, R.i),
       chef: { c: R.c, mood: Chef.moodFor(step) },
     });
     const care = Chef.careFor(step);
@@ -120,7 +165,15 @@
       h('h2', { class: 'step-action' }, actionLabel(step)),
       ings.length ? h('ul', { class: 'step-ings' }, ings.map((ing) =>
         h('li', {}, h('span', { html: ingSVG(ing) }), h('span', {}, h('strong', {}, ingName(ing)), C.amountLabel(ing) ? h('span', { class: 'muted' }, ' · ' + C.amountLabel(ing)) : null)))) : null,
+      // Thành phẩm lấy từ bước trước: bấm để xem lại bước đó.
+      (step.p || []).length ? h('div', { class: 'take-from' },
+        h('div', { class: 'take-label' }, t('cook.takeFrom')),
+        step.p.map((j) => h('button', { class: 'take-item', type: 'button', onclick: () => peek(j) },
+          h('span', { html: C.outSVG(R.st, j, R.i) }),
+          h('strong', {}, C.outName(R.st, j)),
+          h('span', { class: 'take-step' }, t('cook.fromStep', { n: j + 1 }), h('span', { html: ui('right') }))))) : null,
       meta,
+      step.o || C.usedBy(R.st, idx).length ? h('div', { class: 'makes' }, '→ ' + t('cook.makes', { name: C.outName(R.st, idx) })) : null,
       step.t ? h('button', { class: 'btn btn-soft timer-btn', type: 'button', onclick: () => startTimer(step.t, idx), html: ui('clock') + `<span>${t('cook.timer', { t: minutesLabel(step.t) })}</span>` }) : null,
       step.n ? h('div', { class: 'note' }, h('div', { class: 'note-from' }, t('cook.says', { chef: from() })), h('p', { class: 'hand' }, step.n)) : null);
 

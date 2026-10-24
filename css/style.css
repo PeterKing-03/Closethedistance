@@ -393,6 +393,57 @@ button.chip:hover { border-color: var(--mustard); }
 .modal-foot.spread { justify-content: space-between; align-items: center; }
 .temp-input { width: 92px; padding: 6px 12px; border-radius: 999px; text-align: right; }
 
+/* Liên kết giữa các bước: thành phẩm của bước trước làm nguyên liệu cho bước sau. */
+.group-sub { font-size: 13px; font-weight: 800; color: var(--muted); margin-top: 2px; }
+.chip-sub { font-size: 11px; font-weight: 700; color: var(--muted); }
+.chip.on .chip-sub { color: var(--ink); }
+.chip-out .out-icon { width: 30px; height: 30px; display: block; }
+.step-link { font-size: 13px; font-weight: 700; }
+.step-link.uses { color: var(--accent-dark); }
+.step-link.makes { color: #3F7A5C; }
+
+.take-from { width: 100%; display: grid; gap: 8px; text-align: left; }
+.take-label { font-size: 13px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.take-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 8px 12px; border-radius: 14px; cursor: pointer; text-align: left;
+  border: 2px dashed var(--accent); background: #FFF6F0; font-size: 16px;
+}
+.take-item .out-icon { width: 42px; height: 42px; display: block; }
+.take-step { margin-left: auto; display: inline-flex; align-items: center; gap: 2px; color: var(--accent-dark); font-weight: 800; font-size: 14px; white-space: nowrap; }
+.take-step .ui { width: 16px; height: 16px; }
+.makes { font-weight: 800; font-size: 15px; color: #3F7A5C; background: #EEF6F0; border-radius: 12px; padding: 6px 12px; }
+
+.flow { list-style: none; margin: 0; padding: 0; display: grid; }
+.flow-row { position: relative; display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding-bottom: 12px; }
+.flow-row:not(:last-child)::before {
+  content: ''; position: absolute; left: 14px; top: 30px; bottom: 0;
+  border-left: 2px dashed var(--line);
+}
+.flow-num {
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--mustard); border: 2px solid var(--outline); font-weight: 800; font-size: 14px;
+}
+.flow-row.merge .flow-num { background: var(--accent); color: #fff; }
+.flow-body {
+  display: grid; gap: 5px; text-align: left; padding: 3px 0; min-width: 0;
+  border: none; background: none; cursor: pointer; color: inherit;
+}
+.flow-body:hover .flow-title { color: var(--accent-dark); }
+.flow-title { font-weight: 700; }
+.flow-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.flow-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; padding: 2px 10px 2px 6px; border-radius: 999px; }
+.flow-tag .out-icon { width: 22px; height: 22px; display: block; }
+.flow-tag.in { background: #FFF1EC; color: var(--accent-dark); }
+.flow-tag.out { background: #EEF6F0; color: #3F7A5C; justify-self: start; }
+
+/* Nội dung hộp thoại không được đẩy khung rộng ra (căn bếp bên trong tự cuộn ngang). */
+.modal-body > * { min-width: 0; }
+.peek-scene { min-width: 0; overflow: hidden; }
+.peek-scene .kitchen { --kw: 100%; width: 100%; margin-inline: 0; }
+.peek-title { font-size: 22px; }
+.step-ings.left { justify-content: flex-start; }
+
 /* Lời nhắn từ nhà sáng tạo. */
 .intro { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; min-height: calc(100vh - 90px); display: grid; place-items: center; }
 .intro-card {

@@ -94,7 +94,9 @@
       if (ing.k && L.iconNames(ing.k).includes(ing.n)) ing.n = '';
       r.i.push(ing);
     });
-    (Array.isArray(raw.st) ? raw.st : []).slice(0, 50).forEach((x) => {
+    // Vị trí gốc của bước trong link → vị trí sau khi lọc (để liên kết giữa các bước vẫn đúng).
+    const idxMap = new Map();
+    (Array.isArray(raw.st) ? raw.st : []).slice(0, 50).forEach((x, origIdx) => {
       if (!x || typeof x !== 'object') return;
       const S = Kitchen.STATIONS[x.s];
       if (!S || !Object.prototype.hasOwnProperty.call(Kitchen.STATIONS, x.s)) return;
@@ -108,6 +110,11 @@
       const d = Math.round(Number(x.d));
       step.d = S.temp && isFinite(d) && d >= 30 ? Math.min(300, d) : 0;
       step.n = str(x.n, 400);
+      // Thành phẩm của các bước trước dùng trong bước này (chỉ được trỏ về bước đứng trước).
+      step.p = [...new Set((Array.isArray(x.p) ? x.p : []).map((n) => idxMap.get(n | 0)))]
+        .filter((n) => Number.isInteger(n) && n < r.st.length);
+      step.o = str(x.o, 40);
+      idxMap.set(origIdx, r.st.length);
       r.st.push(step);
     });
     // Dụng cụ trên bếp (link cũ không có thì dùng bộ mặc định), luôn gồm dụng cụ dùng trong các bước.
@@ -140,6 +147,63 @@
 
   function stepIngredients(step, ings) {
     return (step.g || []).map((n) => ings[n]).filter(Boolean);
+  }
+
+  // ---------- Liên kết giữa các bước: thành phẩm của bước trước làm nguyên liệu cho bước sau ----------
+  function outName(steps, j) {
+    const s = steps[j];
+    return (s && s.o) || L.t('out.default', { n: j + 1 });
+  }
+
+  // Các bước (vị trí) dùng thành phẩm của bước j.
+  function usedBy(steps, j) {
+    const out = [];
+    steps.forEach((s, i) => { if ((s.p || []).includes(j)) out.push(i); });
+    return out;
+  }
+
+  // Nguyên liệu thô bên trong thành phẩm của bước j (tính cả các bước nó lấy lại).
+  function rawOf(steps, j, ings, seen = new Set()) {
+    if (seen.has(j) || !steps[j]) return [];
+    seen.add(j);
+    const s = steps[j];
+    const list = stepIngredients(s, ings);
+    (s.p || []).forEach((k) => rawOf(steps, k, ings, seen).forEach((x) => { if (!list.includes(x)) list.push(x); }));
+    return list;
+  }
+
+  // Hình thành phẩm: một tô có nguyên liệu nhỏ bên trong và số bước ở góc.
+  function outGraphic(steps, j, ings) {
+    const raws = rawOf(steps, j, ings).slice(0, 3);
+    const spots = [[18, 8], [32, 4], [46, 8]];
+    const inner =
+      raws.map((ing, k) => {
+        const g = graphic(ing);
+        const [cx, y] = spots[raws.length === 1 ? 1 : k];
+        return `<svg x="${cx - 11}" y="${y}" width="22" height="22" viewBox="${g.vb}">${g.inner}</svg>`;
+      }).join('') +
+      `<g fill="none" stroke="#4A3B36" stroke-width="2.5" stroke-linejoin="round">` +
+      `<path d="M6 26 C14 18 50 18 58 26Z" fill="#FFE6BF"/>` +
+      `<path d="M4 26 h56 C60 46 48 58 32 58 C16 58 4 46 4 26Z" fill="#F2CC8F"/>` +
+      `<circle cx="52" cy="48" r="10" fill="#E07A5F"/></g>` +
+      `<text x="52" y="52.5" text-anchor="middle" font-size="12" font-weight="800" font-family="Nunito, sans-serif" fill="#FFFFFF">${j + 1}</text>`;
+    return { vb: '0 0 64 64', inner };
+  }
+  function outSVG(steps, j, ings, cls = '') {
+    const g = outGraphic(steps, j, ings);
+    return `<svg class="ing-icon out-icon ${cls}" viewBox="${g.vb}" aria-hidden="true">${g.inner}</svg>`;
+  }
+
+  // Hình hiển thị trên căn bếp cho một bước: nguyên liệu thô và thành phẩm của bước trước.
+  function stepGraphics(step, steps, ings) {
+    return stepIngredients(step, ings).map(graphic).concat((step.p || []).map((j) => outGraphic(steps, j, ings)));
+  }
+
+  // VD: "Trộn nhẹ: Kem mascarpone (B1), Lòng trắng đánh bông (B2)".
+  function stepTitle(step, steps, ings) {
+    const names = stepIngredients(step, ings).map(ingName)
+      .concat((step.p || []).map((j) => `${outName(steps, j)} (${L.t('step.short', { n: j + 1 })})`));
+    return actionLabel(step) + (names.length ? ': ' + names.join(', ') : '');
   }
 
   // Căn bếp trong khung: bề rộng tự co giãn theo số dụng cụ, cuộn ngang khi quá hẹp,
@@ -237,5 +301,6 @@
     return { el, body, close };
   }
 
-  window.C = { h, ui, graphic, ingSVG, sanitize, actionLabel, ingName, amountLabel, stepIngredients, minutesLabel, kitchenView, langToggle, topbar, store, toast, modal };
+  window.C = { h, ui, graphic, ingSVG, sanitize, actionLabel, ingName, amountLabel, stepIngredients, minutesLabel, kitchenView,
+    outName, usedBy, rawOf, outGraphic, outSVG, stepGraphics, stepTitle, langToggle, topbar, store, toast, modal };
 })();

@@ -218,10 +218,62 @@
     `<path d="M18.6 26 h26.8 l-2.6 28 a2.5 2.5 0 0 1 -2.5 2.5 H23.7 a2.5 2.5 0 0 1 -2.5 -2.5Z" fill="#9FD3F2" stroke="none"/>` +
     face(32, 40, 0.75));
 
+  // ---------- Làm bánh ----------
+  add('long_do', 'Lòng đỏ trứng', 'banh',
+    `<circle cx="32" cy="33" r="13" fill="#FFB627"/>` +
+    `<path d="M10 38 h44 C54 52 44 58 32 58 C20 58 10 52 10 38Z" fill="#8EC5E8"/>` +
+    face(32, 31, 0.7));
+  add('long_trang', 'Lòng trắng trứng', 'banh',
+    `<path d="M15 39 a8 8 0 0 1 6 -13 a11 11 0 0 1 21 -3 a9 9 0 0 1 8 16z" fill="#FFFFFF"/>` +
+    `<path d="M10 38 h44 C54 52 44 58 32 58 C20 58 10 52 10 38Z" fill="#F2CC8F"/>` +
+    face(32, 30, 0.7));
+  add('mascarpone', 'Mascarpone', 'banh',
+    `<path d="M14 26 h36 l-4 28 a4 4 0 0 1 -4 4 h-20 a4 4 0 0 1 -4 -4z" fill="#FFF8EC"/>` +
+    `<rect x="12" y="19" width="40" height="9" rx="4" fill="#9FD3F2"/>` +
+    face(32, 42, 0.75));
+  add('kem_tuoi', 'Kem tươi', 'banh',
+    `<path d="M18 22 L24 10 H40 L46 22Z" fill="#F7A1C4"/>` +
+    `<rect x="18" y="22" width="28" height="36" rx="3" fill="#FFFFFF"/>` +
+    `<path d="M18 48 h28" stroke-width="1.6"/>` +
+    face(32, 35, 0.75));
+  add('pho_mai', 'Phô mai', 'banh',
+    `<path d="M8 36 L46 20 L56 30 V50 H8Z" fill="#FFD95A"/>` +
+    `<path d="M8 36 H56" stroke-width="2"/>` +
+    `<circle cx="18" cy="44" r="2.6" fill="#F2B632" stroke="none"/><circle cx="48" cy="42" r="2.2" fill="#F2B632" stroke="none"/>` +
+    face(32, 42, 0.7));
+  add('banh_quy', 'Bánh quy', 'banh',
+    `<rect x="10" y="18" width="44" height="14" rx="7" fill="#E8C27A"/>` +
+    `<rect x="10" y="36" width="44" height="16" rx="8" fill="#F0D08F"/>` +
+    `<circle cx="20" cy="25" r="1.2" fill="#fff" stroke="none"/><circle cx="32" cy="24" r="1.2" fill="#fff" stroke="none"/><circle cx="44" cy="25" r="1.2" fill="#fff" stroke="none"/>` +
+    face(32, 43, 0.65));
+  add('ca_phe', 'Cà phê', 'banh',
+    `<path d="M26 8 q-4 5 0 10 M36 8 q-4 5 0 10" stroke-width="2"/>` +
+    `<ellipse cx="32" cy="54" rx="24" ry="5" fill="#E8D4C2"/>` +
+    `<path d="M48 30 h4 a6 6 0 0 1 0 12 h-5" stroke-width="3"/>` +
+    `<path d="M14 22 h36 v18 a14 14 0 0 1 -14 14 h-8 a14 14 0 0 1 -14 -14z" fill="#FFFFFF"/>` +
+    `<path d="M16 26 h32" stroke="#7A4B2A" stroke-width="4"/>` +
+    face(32, 38, 0.7));
+  add('cacao', 'Bột cacao', 'banh',
+    `<rect x="16" y="18" width="32" height="40" rx="6" fill="#7A4B2A"/>` +
+    `<rect x="14" y="12" width="36" height="8" rx="3" fill="#C98B5B"/>` +
+    `<circle cx="32" cy="38" r="11" fill="#FFF5E1"/>` +
+    face(32, 37, 0.6));
+  add('socola', 'Sô-cô-la', 'banh',
+    `<rect x="14" y="10" width="36" height="46" rx="4" fill="#6B4226"/>` +
+    `<path d="M26 10 V34 M38 10 V34 M14 22 H50" stroke="#8B5E3C" stroke-width="2"/>` +
+    `<path d="M14 34 h36 v18 a4 4 0 0 1 -4 4 h-28 a4 4 0 0 1 -4 -4z" fill="#E85D4A"/>` +
+    face(32, 44, 0.7));
+  add('men_no', 'Bột nở / men', 'banh',
+    `<path d="M16 14 l4 -4 l4 4 l4 -4 l4 4 l4 -4 l4 4 l4 -4 l4 4 V54 a4 4 0 0 1 -4 4 H20 a4 4 0 0 1 -4 -4Z" fill="#9FD3F2"/>` +
+    `<rect x="16" y="40" width="32" height="8" fill="#FFD166" stroke="none"/>` +
+    face(32, 28, 0.75));
+  add('vani', 'Vani', 'banh', bottle('#5B3A29', '#F2CC8F', '#FFF5E1'));
+
   const CATS = [
     { key: 'rau', name: 'Rau củ' },
     { key: 'dam', name: 'Thịt, cá, trứng' },
     { key: 'gia_vi', name: 'Gia vị' },
+    { key: 'banh', name: 'Làm bánh' },
     { key: 'khac', name: 'Khác' },
   ];
 
