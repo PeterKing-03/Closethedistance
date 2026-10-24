@@ -5,7 +5,9 @@ Gửi yêu thương qua từng món ăn. Một website nhỏ cho các cặp đô
 ## Tính năng
 - Tạo nhân vật Chef (nam/nữ, da, tóc, mũ, tạp dề). Chef nghiêm túc nhắc nhở ở các bước cắt thái, chiên xào.
 - 35 icon nguyên liệu và bảng vẽ để tự vẽ nguyên liệu, định lượng theo g, ml, muỗng, quả...
-- Bộ 19 dụng cụ nhà bếp (sơ chế, nấu, làm bánh), tự chọn dụng cụ có trên bếp; căn bếp rộng ra theo số dụng cụ.
+- Bếp Việt (mặc định) hoặc bếp hiện đại: tường gạch bông, cửa sổ chớp, kệ nước mắm tương ớt, chùm tỏi ớt, mâm cơm.
+- 95 nguyên liệu (có gia vị, rau thơm, bún phở kiểu Việt), đơn vị đo kiểu Việt (lạng, trái, con, nhánh, nắm, muỗng vun...).
+- Bộ 29 dụng cụ nhà bếp (bếp Việt, sơ chế, nấu, làm bánh), tự chọn dụng cụ có trên bếp; căn bếp rộng ra theo số dụng cụ.
 - Soạn từng bước trên giao diện căn bếp: mức lửa, nhiệt độ lò (°C), thời gian, lời dặn.
 - Liên kết giữa các bước: thành phẩm của một bước (VD "Kem mascarpone") làm nguyên liệu cho bước sau; người nhận có sơ đồ tổng quan các bước và xem lại nhanh được bước trước.
 - Lời nhắn từ nhà sáng tạo hiện đầu tiên khi mở link.

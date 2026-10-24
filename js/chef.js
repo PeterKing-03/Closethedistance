@@ -23,7 +23,10 @@
   }
 
   // Cắt thái, chiên xào, lò nướng, nồi chiên, máy xay, lửa lớn: Chef nghiêm túc nhắc nhở.
-  const CARE_TOOLS = { thot: 'care.thot', chao: 'care.chao', lo_nuong: 'care.oven', noi_chien: 'care.oven', may_xay: 'care.blender' };
+  const CARE_TOOLS = {
+    thot: 'care.thot', thot_tron: 'care.thot', dao_phay: 'care.cleaver', chao: 'care.chao', lo_nuong: 'care.oven', noi_chien: 'care.oven',
+    may_xay: 'care.blender', bep_than: 'care.charcoal', noi_ap_suat: 'care.pressure',
+  };
   function careKey(step) {
     if (!step || !step.s) return '';
     if (step.s === 'chao' && (!step.a || step.a === 'nem')) return step.h === 3 ? 'care.heat' : '';

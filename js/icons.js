@@ -190,11 +190,11 @@
     face(32, 28, 0.75));
 
   // ---------- Khác ----------
-  add('gao', 'Gạo / cơm', 'khac',
+  add('gao', 'Gạo / cơm', 'tinh_bot',
     bowl('#8EC5E8',
       `<path d="M12 35 C12 20 22 15 32 15 C42 15 52 20 52 35Z" fill="#FFFFFF"/>` +
       `<path d="M22 24 l2 -1 M30 20 l2 0 M40 25 l-2 -1 M34 28 l2 1" stroke-width="1.6"/>`));
-  add('mi', 'Mì / bún', 'khac',
+  add('mi', 'Mì', 'tinh_bot',
     bowl('#F2A65A',
       `<path d="M40 6 L30 34 M48 9 L34 34" stroke-width="3"/>` +
       `<path d="M12 35 C12 24 22 20 32 20 C42 20 52 24 52 35Z" fill="#F7D774"/>` +
@@ -269,10 +269,209 @@
     face(32, 28, 0.75));
   add('vani', 'Vani', 'banh', bottle('#5B3A29', '#F2CC8F', '#FFF5E1'));
 
+  // =================== Bếp Việt ===================
+  function jar(body, lid, extra = '') {
+    return (
+      `<rect x="16" y="20" width="32" height="36" rx="7" fill="${body}"/>` +
+      `<rect x="14" y="14" width="36" height="8" rx="4" fill="${lid}"/>` + extra +
+      `<rect x="21" y="32" width="22" height="16" rx="4" fill="#FFF5E1"/>` +
+      face(32, 39, 0.6)
+    );
+  }
+  function packet(fill, band, extra = '') {
+    return (
+      `<path d="M16 14 l4 -4 l4 4 l4 -4 l4 4 l4 -4 l4 4 l4 -4 l4 4 V54 a4 4 0 0 1 -4 4 H20 a4 4 0 0 1 -4 -4Z" fill="${fill}"/>` +
+      `<rect x="16" y="40" width="32" height="8" fill="${band}" stroke="none"/>` + extra +
+      face(32, 28, 0.75)
+    );
+  }
+  // Bó rau thơm: 3 cọng tỏa ra, lá theo kiểu (oval, hẹp, tròn, kép, mũi tên), buộc dây đỏ.
+  function herb(color, kind, stem = '#4E8F4E', withFace = true) {
+    const leaf = (x, y, a, s) => {
+      if (kind === 'round') {
+        return [[-4, 0], [4, 0], [0, -6]].map(([dx, dy]) => `<circle cx="${x + dx * s}" cy="${y + dy * s}" r="${5 * s}" fill="${color}"/>`).join('');
+      }
+      if (kind === 'double') {
+        return `<ellipse cx="${x}" cy="${y - 7 * s}" rx="${5 * s}" ry="${7 * s}" transform="rotate(${a} ${x} ${y})" fill="${color}"/>` +
+          `<ellipse cx="${x}" cy="${y + 5 * s}" rx="${4 * s}" ry="${6 * s}" transform="rotate(${a} ${x} ${y})" fill="${color}"/>`;
+      }
+      if (kind === 'arrow') {
+        return `<path d="M${x} ${y - 12 * s} L${x + 6 * s} ${y + 6 * s} L${x} ${y + 2 * s} L${x - 6 * s} ${y + 6 * s}Z" transform="rotate(${a} ${x} ${y})" fill="${color}"/>`;
+      }
+      const [rx, ry] = kind === 'narrow' ? [3.6, 11] : [7, 10.5];
+      return `<ellipse cx="${x}" cy="${y}" rx="${rx * s}" ry="${ry * s}" transform="rotate(${a} ${x} ${y})" fill="${color}"/>`;
+    };
+    const pts = [[23, 35, -55, 0.75], [41, 35, 55, 0.75], [18, 22, -35, 1], [46, 22, 35, 1], [32, 15, 0, 1]];
+    return (
+      `<path d="M32 58 L18 22 M32 58 L32 15 M32 58 L46 22" stroke="${stem}" stroke-width="2.6"/>` +
+      pts.map(([x, y, a, s]) => leaf(x, y, a, s)).join('') +
+      `<path d="M26 49 h12" stroke="#E63946" stroke-width="4"/>` +
+      (withFace && kind !== 'narrow' ? face(32, 16, 0.42) : '')
+    );
+  }
+
+  // ---------- Gia vị Việt ----------
+  add('bot_ngot', 'Bột ngọt', 'gia_vi', packet('#FFFFFF', '#4E9BD6', '<path d="M26 50 l2 2 M34 51 l2 -2" stroke-width="1.4"/>'));
+  add('dau_hao', 'Dầu hào', 'gia_vi', bottle('#5B3A29', '#E85D4A', '#FFD166'));
+  add('tuong_ot', 'Tương ớt', 'gia_vi', bottle('#E63946', '#7BC47F', '#FFF5E1'));
+  add('sa_te', 'Sa tế', 'gia_vi', jar('#C9302C', '#F2CC8F', '<circle cx="22" cy="52" r="1.6" fill="#FFD166" stroke="none"/><circle cx="42" cy="51" r="1.6" fill="#FFD166" stroke="none"/>'));
+  add('mam_tom', 'Mắm tôm', 'gia_vi', jar('#B48CB5', '#E07A5F'));
+  add('mam_ruoc', 'Mắm ruốc', 'gia_vi', jar('#D98B8B', '#81B29A'));
+  add('giam', 'Giấm', 'gia_vi', bottle('#EAF6FD', '#81B29A', '#FFFFFF'));
+  add('me', 'Me', 'gia_vi',
+    `<path d="M10 22 C18 14 30 26 38 20 C46 14 54 22 52 28 C44 34 34 26 26 32 C18 38 8 30 10 22Z" fill="#9C6B33"/>` +
+    `<path d="M14 40 C22 34 32 44 40 40 C48 36 56 42 52 48 C44 54 34 46 26 52 C18 56 10 48 14 40Z" fill="#B07A43"/>` +
+    face(32, 45, 0.6));
+  add('nuoc_mau', 'Nước màu', 'gia_vi',
+    bowl('#F2CC8F', `<path d="M12 35 C14 26 50 26 52 35Z" fill="#7A4B2A"/><path d="M24 30 q3 -2 6 0" stroke="#C98B5B" stroke-width="1.6"/>`));
+  add('ngu_vi', 'Ngũ vị hương', 'gia_vi', jar('#C98B5B', '#5B3A29'));
+  add('que', 'Quế', 'gia_vi',
+    `<rect x="8" y="18" width="48" height="12" rx="6" fill="#B5713A"/>` +
+    `<rect x="8" y="34" width="48" height="12" rx="6" fill="#C98B5B"/>` +
+    `<path d="M14 24 a3 3 0 1 1 0.1 0 M14 40 a3 3 0 1 1 0.1 0" stroke-width="1.6"/>` +
+    face(36, 39, 0.6));
+  add('hoa_hoi', 'Hoa hồi', 'gia_vi',
+    `<path d="M32 6 L37 24 L54 16 L42 30 L58 38 L40 38 L42 56 L32 42 L22 56 L24 38 L6 38 L22 30 L10 16 L27 24Z" fill="#8B5A33"/>` +
+    `<circle cx="32" cy="32" r="9" fill="#B07A43"/>` +
+    face(32, 31, 0.55));
+  add('thao_qua', 'Thảo quả', 'gia_vi',
+    `<ellipse cx="24" cy="34" rx="12" ry="18" transform="rotate(-15 24 34)" fill="#5B3A29"/>` +
+    `<ellipse cx="42" cy="34" rx="11" ry="17" transform="rotate(15 42 34)" fill="#7A4B2A"/>` +
+    `<path d="M42 20 v28 M24 20 v28" stroke="#9C6B33" stroke-width="1.4"/>` +
+    face(42, 36, 0.55));
+  add('duong_phen', 'Đường phèn', 'gia_vi',
+    `<path d="M10 40 L20 26 L34 30 L30 48 L14 50Z" fill="#FCE7B8"/>` +
+    `<path d="M30 30 L44 18 L56 30 L50 50 L32 48Z" fill="#FFF3D6"/>` +
+    face(43, 35, 0.6));
+  add('bot_nghe', 'Bột nghệ', 'gia_vi', jar('#F4B400', '#E85D4A'));
+  add('dau_dieu', 'Dầu điều', 'gia_vi', bottle('#E8562A', '#F2CC8F', '#FFF5E1'));
+  add('me_rang', 'Mè rang', 'gia_vi',
+    bowl('#8EC5E8', `<path d="M12 35 C12 24 52 24 52 35Z" fill="#F3E3C3"/>` +
+      [[20, 30], [27, 27], [34, 29], [41, 27], [46, 31], [30, 32]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="1.4" ry="2.2" fill="#B07A43" stroke="none"/>`).join('')));
+  add('dau_phong', 'Đậu phộng rang', 'gia_vi',
+    `<path d="M12 22 C12 12 28 12 28 22 C28 26 26 28 26 32 C26 36 30 38 30 44 C30 56 10 56 10 44 C10 38 14 36 14 32 C14 28 12 26 12 22Z" fill="#E3B57A"/>` +
+    `<path d="M36 26 C36 16 52 16 52 26 C52 30 50 32 50 36 C50 40 54 42 54 48 C54 60 34 60 34 48 C34 42 38 40 38 36 C38 32 36 30 36 26Z" fill="#D9A866"/>` +
+    face(44, 46, 0.55));
+  add('hanh_phi', 'Hành phi', 'gia_vi',
+    bowl('#F2CC8F', `<path d="M12 35 C12 24 52 24 52 35Z" fill="#C98B5B"/><path d="M18 30 q4 -4 8 0 M28 28 q4 -4 8 0 M38 30 q4 -4 8 0" stroke="#8B5E3C" stroke-width="1.6"/>`));
+  add('nuoc_cot_dua', 'Nước cốt dừa', 'gia_vi',
+    `<path d="M6 30 h52 C58 48 46 58 32 58 C18 58 6 48 6 30Z" fill="#8B5E3C"/>` +
+    `<path d="M11 30 h42 C53 44 44 52 32 52 C20 52 11 44 11 30Z" fill="#FFFFFF" stroke="none"/>` +
+    `<ellipse cx="32" cy="30" rx="26" ry="5" fill="#FFFDF5"/>` +
+    face(32, 42, 0.7));
+
+  // ---------- Rau thơm ----------
+  add('rau_ram', 'Rau răm', 'rau_thom', herb('#5FA85F', 'narrow', '#8E5BA8'));
+  add('ngo_ri', 'Ngò rí', 'rau_thom', herb('#7BC47F', 'round'));
+  add('ngo_gai', 'Ngò gai', 'rau_thom',
+    [-40, -20, 0, 20, 40].map((a, k) => `<ellipse cx="32" cy="30" rx="4.5" ry="20" transform="rotate(${a} 32 54)" fill="${k % 2 ? '#5FA85F' : '#4E8F4E'}"/>`).join('') +
+    `<path d="M26 50 h12" stroke="#E63946" stroke-width="4"/>` + face(32, 22, 0.45));
+  add('hung_que', 'Húng quế', 'rau_thom', herb('#5FA85F', 'oval', '#8E5BA8'));
+  add('tia_to', 'Tía tô', 'rau_thom', herb('#9B6BB5', 'oval', '#6B4E7A'));
+  add('kinh_gioi', 'Kinh giới', 'rau_thom', herb('#9ED89B', 'oval'));
+  add('thi_la', 'Thì là', 'rau_thom',
+    `<path d="M32 58 L20 16 M32 58 L32 10 M32 58 L44 16" stroke="#5FA85F" stroke-width="2.4"/>` +
+    [[20, 16], [32, 10], [44, 16]].map(([x, y]) => [0, 8, 16, 24].map((d) =>
+      `<path d="M${x + (32 - x) * d / 48} ${y + d} l-6 -5 M${x + (32 - x) * d / 48} ${y + d} l6 -5" stroke="#7BC47F" stroke-width="2"/>`).join('')).join('') +
+    `<path d="M26 50 h12" stroke="#E63946" stroke-width="4"/>`);
+  add('la_chanh', 'Lá chanh', 'rau_thom', herb('#3F7A3F', 'double'));
+  add('la_lot', 'Lá lốt', 'rau_thom',
+    `<path d="M32 56 V62" stroke="#4E8F4E" stroke-width="3"/>` +
+    `<path d="M32 56 C14 48 6 30 14 18 C20 10 30 12 32 20 C34 12 44 10 50 18 C58 30 50 48 32 56Z" fill="#5FA85F"/>` +
+    `<path d="M32 22 V52 M32 34 l-10 -6 M32 34 l10 -6 M32 44 l-9 -5 M32 44 l9 -5" stroke="#3F7A3F" stroke-width="1.4"/>` +
+    face(32, 28, 0.6));
+  add('he', 'Hẹ', 'rau_thom',
+    [18, 24, 30, 36, 42].map((x, k) => `<rect x="${x}" y="${6 + (k % 2) * 6}" width="5" height="${44 - (k % 2) * 6}" rx="2.5" fill="${k % 2 ? '#7BC47F' : '#5FA85F'}"/>`).join('') +
+    `<path d="M16 48 h32" stroke="#E63946" stroke-width="4"/>` + `<path d="M20 52 v6 M28 52 v7 M36 52 v7 M44 52 v6" stroke="#F6F2E6" stroke-width="3"/>`);
+  add('gia_do', 'Giá đỗ', 'rau_thom',
+    [[14, 0], [24, 4], [34, -2], [44, 3], [52, -1]].map(([x, d]) =>
+      `<path d="M${x} ${54 + d} C${x - 6} ${40 + d} ${x + 8} ${26 + d} ${x} ${16 + d}" stroke="#F6F2E6" stroke-width="5"/>` +
+      `<path d="M${x} ${54 + d} C${x - 6} ${40 + d} ${x + 8} ${26 + d} ${x} ${16 + d}" stroke="${O}" stroke-width="1" opacity=".35"/>` +
+      `<ellipse cx="${x}" cy="${14 + d}" rx="4" ry="3.2" fill="#FFD95A"/>`).join(''));
+  add('rau_muong', 'Rau muống', 'rau_thom', herb('#5FA85F', 'arrow', '#9ED89B'));
+  add('bi_do', 'Bí đỏ', 'rau',
+    `<path d="M32 16 V8 l5 -2" stroke="#4E8F4E" stroke-width="3"/>` +
+    `<ellipse cx="22" cy="38" rx="14" ry="18" fill="#F4A259"/><ellipse cx="42" cy="38" rx="14" ry="18" fill="#F4A259"/>` +
+    `<ellipse cx="32" cy="38" rx="11" ry="19" fill="#F7B26F"/>` +
+    face(32, 40, 0.75));
+  add('kho_qua', 'Khổ qua', 'rau',
+    `<path d="M52 12 l4 -4" stroke="#4E8F4E" stroke-width="3"/>` +
+    `<path d="M50 14 C58 22 44 44 30 54 C22 60 10 58 10 50 C10 40 28 24 40 14 C44 10 48 10 50 14Z" fill="#7BC47F"/>` +
+    [[22, 44], [30, 36], [38, 28], [44, 20], [18, 52]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="#B5DD84" stroke="none"/>`).join('') +
+    face(32, 42, 0.6));
+  add('dau_bap', 'Đậu bắp', 'rau',
+    `<path d="M44 10 h10 v8 h-10z" fill="#4E8F4E"/>` +
+    `<path d="M46 18 C48 30 34 50 14 58 C24 46 34 32 40 18Z" fill="#7BC47F"/>` +
+    `<path d="M43 20 C38 34 30 46 18 55" stroke="#4E8F4E" stroke-width="1.4"/>` +
+    face(36, 32, 0.55));
+
+  // ---------- Thịt, hải sản Việt ----------
+  add('ba_chi', 'Thịt ba chỉ', 'dam',
+    `<rect x="8" y="12" width="48" height="40" rx="8" fill="#F6A9A0"/>` +
+    `<rect x="8" y="12" width="48" height="8" rx="4" fill="#E3B07F"/>` +
+    `<path d="M9 28 h46 M9 38 h46" stroke="#FFF1EC" stroke-width="4"/>` +
+    face(32, 45, 0.7));
+  add('suon', 'Sườn', 'dam',
+    `<rect x="4" y="20" width="10" height="7" rx="3.5" fill="#FFF8EC"/><rect x="4" y="33" width="10" height="7" rx="3.5" fill="#FFF8EC"/><rect x="4" y="46" width="10" height="7" rx="3.5" fill="#FFF8EC"/>` +
+    `<rect x="12" y="14" width="46" height="44" rx="10" fill="#D9534F"/>` +
+    `<path d="M14 30 h30 M14 43 h30" stroke="#FBE3DD" stroke-width="2"/>` +
+    face(38, 36, 0.75));
+  add('muc', 'Mực', 'dam',
+    `<path d="M22 40 C18 50 14 54 10 58 M28 42 C26 52 24 56 22 60 M36 42 C38 52 40 56 42 60 M42 40 C46 50 50 54 54 58" stroke="#E8A0A0" stroke-width="4"/>` +
+    `<path d="M32 4 C44 12 46 30 44 42 H20 C18 30 20 12 32 4Z" fill="#F6D5D5"/>` +
+    `<path d="M20 14 l-8 4 l8 6 M44 14 l8 4 l-8 6" fill="#F6D5D5"/>` +
+    face(32, 32, 0.7));
+  add('ngheu', 'Nghêu, sò', 'dam',
+    `<path d="M8 40 C8 22 20 12 32 12 C44 12 56 22 56 40 C48 46 16 46 8 40Z" fill="#EADFC8"/>` +
+    `<path d="M32 14 V44 M20 18 C22 28 22 38 22 44 M44 18 C42 28 42 38 42 44" stroke="#C8B59A" stroke-width="1.6"/>` +
+    `<path d="M24 44 h16 l-2 6 h-12z" fill="#D9C7B3"/>` +
+    face(32, 32, 0.6));
+  add('cua', 'Cua', 'dam',
+    `<path d="M14 38 l-8 6 M14 44 l-7 8 M50 38 l8 6 M50 44 l7 8" stroke-width="3"/>` +
+    `<path d="M16 26 C8 18 8 10 16 8 C18 14 22 16 24 22Z" fill="#E85D4A"/><path d="M48 26 C56 18 56 10 48 8 C46 14 42 16 40 22Z" fill="#E85D4A"/>` +
+    `<ellipse cx="32" cy="38" rx="20" ry="14" fill="#EF6351"/>` +
+    face(32, 37, 0.8));
+  add('gio_lua', 'Giò lụa', 'dam',
+    `<rect x="6" y="20" width="40" height="28" rx="6" fill="#6CBF6C"/>` +
+    `<path d="M14 20 v28 M24 20 v28 M34 20 v28" stroke="#4E8F4E" stroke-width="1.4"/>` +
+    `<ellipse cx="46" cy="34" rx="12" ry="14" fill="#F3D9D2"/>` +
+    face(46, 33, 0.6));
+
+  // ---------- Tinh bột: bún, phở, gạo ----------
+  add('bun', 'Bún', 'tinh_bot',
+    bowl('#8EC5E8', `<path d="M12 35 C12 24 22 20 32 20 C42 20 52 24 52 35Z" fill="#FFFFFF"/>` +
+      `<path d="M16 32 q4 -6 8 0 q4 -6 8 0 q4 -6 8 0 q4 -6 8 0 M20 26 q4 -4 8 0 q4 -4 8 0 q4 -4 8 0" stroke-width="1.2" opacity=".55"/>`));
+  add('banh_pho', 'Bánh phở', 'tinh_bot',
+    `<rect x="8" y="40" width="48" height="12" rx="5" fill="#FFFDF5"/>` +
+    `<rect x="10" y="29" width="44" height="12" rx="5" fill="#FFFFFF"/>` +
+    `<rect x="12" y="18" width="40" height="12" rx="5" fill="#FFFDF5"/>` +
+    `<path d="M18 24 h28 M16 35 h32" stroke-width="1.2" opacity=".4"/>` +
+    face(32, 46, 0.55));
+  add('mien', 'Miến', 'tinh_bot',
+    `<path d="M14 14 C20 24 12 36 18 50 M22 12 C28 24 20 36 26 52 M30 12 C36 24 28 36 34 52 M38 12 C44 24 36 36 42 52 M46 14 C52 24 44 36 50 50" stroke="#B9DCEF" stroke-width="3"/>` +
+    `<rect x="12" y="28" width="40" height="10" rx="5" fill="#F7A1C4"/>` +
+    face(32, 33, 0.5));
+  add('banh_trang', 'Bánh tráng', 'tinh_bot',
+    `<circle cx="32" cy="32" r="24" fill="#FFF8EC"/>` +
+    `<path d="M16 20 L48 44 M16 44 L48 20 M10 32 H54 M32 8 V56" stroke="#E8D4C2" stroke-width="1.4"/>` +
+    `<circle cx="32" cy="32" r="11" fill="#FFF8EC" stroke="none"/>` +
+    face(32, 31, 0.65));
+  add('banh_mi', 'Bánh mì', 'tinh_bot',
+    `<path d="M6 40 C6 26 36 14 52 18 C60 20 60 30 54 36 C44 46 14 54 8 48 C6 46 6 43 6 40Z" fill="#E9A85A"/>` +
+    `<path d="M20 30 l6 8 M30 26 l6 8 M40 22 l6 8" stroke="#F7D18F" stroke-width="3"/>` +
+    face(26, 42, 0.55));
+  add('gao_nep', 'Gạo nếp', 'tinh_bot',
+    `<path d="M4 44 C14 30 50 30 60 44 L52 52 H12Z" fill="#7BC47F"/>` +
+    bowl('#FFFFFF', `<path d="M12 35 C12 20 22 14 32 14 C42 14 52 20 52 35Z" fill="#FFFDF5"/><path d="M22 24 l2 -1 M30 20 l2 0 M40 25 l-2 -1" stroke-width="1.6"/>`));
+  add('bot_nang', 'Bột năng', 'tinh_bot', packet('#FFFFFF', '#81B29A'));
+  add('bot_chien', 'Bột chiên giòn', 'tinh_bot', packet('#F7D774', '#E85D4A'));
+
   const CATS = [
-    { key: 'rau', name: 'Rau củ' },
-    { key: 'dam', name: 'Thịt, cá, trứng' },
     { key: 'gia_vi', name: 'Gia vị' },
+    { key: 'rau', name: 'Rau củ' },
+    { key: 'rau_thom', name: 'Rau thơm' },
+    { key: 'dam', name: 'Thịt, cá, trứng' },
+    { key: 'tinh_bot', name: 'Bún, phở, gạo' },
     { key: 'banh', name: 'Làm bánh' },
     { key: 'khac', name: 'Khác' },
   ];

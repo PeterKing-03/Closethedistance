@@ -127,7 +127,7 @@
     if (s.t) meta.push(minutesLabel(s.t));
     // Bọc trong h() để các phần trống (null) được bỏ qua, không hiện thành chữ "null".
     m.body.append(h('div', { class: 'modal-body' },
-      h('div', { class: 'peek-scene' }, C.kitchenView({ tools: R.k, active: s.s, heat: s.h, temp: s.d, items: C.stepGraphics(s, R.st, R.i), chef: { c: R.c, mood: Chef.moodFor(s) } })),
+      h('div', { class: 'peek-scene' }, C.kitchenView({ tools: R.k, theme: R.th, active: s.s, heat: s.h, temp: s.d, items: C.stepGraphics(s, R.st, R.i), chef: { c: R.c, mood: Chef.moodFor(s) } })),
       h('h3', { class: 'peek-title' }, actionLabel(s)),
       h('p', { class: 'muted' }, meta.join(' · ')),
       ings.length ? h('ul', { class: 'step-ings left' }, ings.map((ing) =>
@@ -150,7 +150,7 @@
       h('div', { class: 'progress-bar' }, h('span', { style: `width:${((idx + 1) / n) * 100}%` })));
 
     const scene = C.kitchenView({
-      tools: R.k, active: step.s, heat: step.h, temp: step.d, items: C.stepGraphics(step, R.st, R.i),
+      tools: R.k, theme: R.th, active: step.s, heat: step.h, temp: step.d, items: C.stepGraphics(step, R.st, R.i),
       chef: { c: R.c, mood: Chef.moodFor(step) },
     });
     const care = Chef.careFor(step);

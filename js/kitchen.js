@@ -190,31 +190,142 @@
       `<circle cx="${x + 119}" cy="${b - 32}" r="2.6" fill="${on ? '#E63946' : '#CFC3B8'}" stroke="none"/>`,
   });
 
+  // ---------- Bếp Việt ----------
+  tool('thot_tron', {
+    name: 'Thớt gỗ tròn', cat: 'viet', w: 92, h: 30,
+    actions: { chat: 'Chặt miếng', bam: 'Băm nhỏ', thai_lat: 'Thái lát', thai_hat_luu: 'Thái hạt lựu', dap: 'Đập dập', so_che: 'Sơ chế' },
+    draw: (x, b) =>
+      `<path d="M${x} ${b - 24} V${b - 5} a46 5 0 0 0 92 0 V${b - 24}Z" fill="#C98B5B"/>` +
+      `<ellipse cx="${x + 46}" cy="${b - 24}" rx="46" ry="6" fill="#E8C27A"/>` +
+      `<ellipse cx="${x + 46}" cy="${b - 24}" rx="28" ry="3.4" stroke-width="1.4" opacity=".5"/>` +
+      `<path d="M${x + 12} ${b - 16} v6 M${x + 30} ${b - 14} v8 M${x + 62} ${b - 14} v8 M${x + 80} ${b - 16} v6" stroke-width="1.4" opacity=".45"/>`,
+  });
+  tool('dao_phay', {
+    name: 'Dao phay', cat: 'viet', w: 74, h: 48, cx: 30, body: 50,
+    actions: { chat: 'Chặt miếng', dap: 'Đập dập', thai_lat: 'Thái lát' },
+    draw: (x, b) =>
+      `<rect x="${x}" y="${b - 18}" width="56" height="18" rx="4" fill="#C98B5B"/>` +
+      `<path d="M${x + 8} ${b - 16} L${x + 10} ${b - 46} H${x + 46} L${x + 48} ${b - 16}Z" fill="#E3E9EE"/>` +
+      `<circle cx="${x + 40}" cy="${b - 38}" r="3" fill="#FCEBDB" stroke-width="2"/>` +
+      `<rect x="${x + 46}" y="${b - 46}" width="28" height="9" rx="4" fill="#6B4226"/>`,
+  });
+  tool('ban_nao', {
+    name: 'Bàn nạo', cat: 'viet', w: 34, h: 74, cx: 17, body: 30,
+    actions: { nao_soi: 'Nạo sợi', got_vo: 'Gọt vỏ' },
+    draw: (x, b) =>
+      `<rect x="${x + 11}" y="${b - 74}" width="12" height="20" rx="6" fill="#81B29A"/>` +
+      `<rect x="${x + 2}" y="${b - 56}" width="30" height="56" rx="5" fill="#E3E9EE"/>` +
+      [12, 22, 32, 42].map((dy) => `<path d="M${x + 8} ${b - 56 + dy} h18" stroke-width="1.6" stroke-dasharray="3 3"/>`).join(''),
+  });
+  tool('ro_tre', {
+    name: 'Rổ rá tre', cat: 'viet', w: 110, h: 18,
+    actions: { nhat: 'Nhặt rau', de_rao: 'Để ráo', rua: 'Rửa sạch', phoi: 'Phơi' },
+    draw: (x, b) =>
+      `<path d="M${x} ${b - 12} h110 C${x + 104} ${b - 2} ${x + 88} ${b} ${x + 55} ${b} C${x + 22} ${b} ${x + 6} ${b - 2} ${x} ${b - 12}Z" fill="#E3C08A"/>` +
+      `<ellipse cx="${x + 55}" cy="${b - 12}" rx="55" ry="6" fill="#F0D7A8"/>` +
+      [14, 28, 42, 56, 70, 84, 98].map((dx) => `<path d="M${x + dx} ${b - 16} l5 8" stroke-width="1.2" opacity=".45"/>`).join(''),
+  });
+  tool('noi_dat', {
+    name: 'Nồi đất (niêu, tộ)', cat: 'viet', w: 86, h: 54, stove: true,
+    actions: { kho_to: 'Kho tộ', kho_quet: 'Kho quẹt', rim: 'Rim', om: 'Om', thang_mau: 'Thắng nước màu', nau_com: 'Nấu cơm niêu' },
+    draw: (x, b) =>
+      `<path d="M${x} ${b - 34} h8 M${x + 78} ${b - 34} h8" stroke-width="6"/>` +
+      `<path d="M${x + 6} ${b - 40} h74 C${x + 84} ${b - 18} ${x + 72} ${b} ${x + 43} ${b} C${x + 14} ${b} ${x + 2} ${b - 18} ${x + 6} ${b - 40}Z" fill="#B5603A"/>` +
+      `<path d="M${x + 10} ${b - 28} h66" stroke="#8E4528" stroke-width="2"/>` +
+      `<path d="M${x + 4} ${b - 40} q39 -18 78 0z" fill="#C9744A"/>` +
+      `<circle cx="${x + 43}" cy="${b - 50}" r="4" fill="#8E4528"/>`,
+  });
+  tool('noi_ap_suat', {
+    name: 'Nồi áp suất', cat: 'viet', w: 120, h: 70, cx: 44, body: 80, stove: true,
+    actions: { ham: 'Hầm', ham_xuong: 'Hầm xương', xa_hoi: 'Xả hơi' },
+    draw: (x, b) =>
+      `<path d="M${x + 82} ${b - 52} H${x + 118}" stroke="${O}" stroke-width="10"/><path d="M${x + 82} ${b - 52} H${x + 118}" stroke="#4A3B36" stroke-width="5"/>` +
+      `<path d="M${x + 4} ${b - 50} h80 v40 q0 10 -10 10 h-60 q-10 0 -10 -10z" fill="#D8DEE3"/>` +
+      `<path d="M${x} ${b - 52} q44 -20 88 0z" fill="#C8CDD3"/>` +
+      `<rect x="${x + 39}" y="${b - 70}" width="10" height="10" rx="3" fill="#E63946"/>` +
+      `<path d="M${x + 8} ${b - 36} h72" stroke-width="1.6" opacity=".5"/>`,
+  });
+  tool('noi_lau', {
+    name: 'Nồi lẩu điện', cat: 'viet', w: 110, h: 48, appliance: true, fire: true,
+    actions: { nau_lau: 'Nấu nước lẩu', nhung: 'Nhúng', nem: 'Nêm nếm' },
+    draw: (x, b, on) =>
+      `<rect x="${x + 8}" y="${b - 14}" width="94" height="14" rx="5" fill="#4A3B36"/>` +
+      `<circle cx="${x + 55}" cy="${b - 7}" r="3" fill="${on ? '#E63946' : '#7A6A60'}" stroke="none"/>` +
+      `<path d="M${x} ${b - 40} h110 C${x + 108} ${b - 20} ${x + 94} ${b - 14} ${x + 55} ${b - 14} C${x + 16} ${b - 14} ${x + 2} ${b - 20} ${x} ${b - 40}Z" fill="#E07A5F"/>` +
+      `<ellipse cx="${x + 55}" cy="${b - 40}" rx="55" ry="6" fill="${on ? '#E8562A' : '#EB9C86'}"/>` +
+      `<path d="M${x + 55} ${b - 46} v-2" stroke-width="2"/>`,
+  });
+  tool('bep_than', {
+    name: 'Bếp than & vỉ nướng', cat: 'viet', w: 96, h: 56, fire: true,
+    actions: { nuong_than: 'Nướng than', lat: 'Lật mặt', quet_mo: 'Quét mỡ hành' },
+    draw: (x, b, on) =>
+      `<path d="M${x + 6} ${b - 44} h84 l-8 44 h-68z" fill="#B5603A"/>` +
+      `<rect x="${x + 30}" y="${b - 22}" width="36" height="12" rx="3" fill="${on ? '#FF9F43' : '#5C4B45'}"/>` +
+      `<path d="M${x + 12} ${b - 44} h72" stroke="${on ? '#E8562A' : '#4A3B36'}" stroke-width="5"/>` +
+      `<path d="M${x} ${b - 48} h96" stroke-width="3"/>` +
+      [12, 26, 40, 54, 68, 82].map((dx) => `<path d="M${x + dx} ${b - 52} v8" stroke-width="2"/>`).join(''),
+  });
+  tool('dua_ca', {
+    name: 'Đũa cả & vá', cat: 'viet', w: 44, h: 84, cx: 22, body: 36,
+    actions: { dao: 'Đảo đều', xoi: 'Xới cơm', muc_canh: 'Múc canh' },
+    draw: (x, b) =>
+      `<path d="M${x + 12} ${b - 30} L${x + 6} ${b - 84} M${x + 18} ${b - 30} L${x + 14} ${b - 84}" stroke="#C98B5B" stroke-width="4"/>` +
+      `<path d="M${x + 28} ${b - 30} L${x + 34} ${b - 72}" stroke="#8B5E3C" stroke-width="4"/>` +
+      `<path d="M${x + 26} ${b - 74} a8 8 0 1 0 16 0z" fill="#C8CDD3"/>` +
+      `<rect x="${x + 2}" y="${b - 34}" width="40" height="34" rx="6" fill="#81B29A"/>`,
+  });
+  tool('phin', {
+    name: 'Phin cà phê', cat: 'viet', w: 44, h: 64,
+    actions: { pha_phin: 'Pha cà phê phin', khuay: 'Khuấy đều' },
+    draw: (x, b) =>
+      `<path d="M${x + 6} ${b - 38} h32 l-3 34 a4 4 0 0 1 -4 4 h-18 a4 4 0 0 1 -4 -4z" fill="#EAF6FD"/>` +
+      `<path d="M${x + 8} ${b - 16} h28 l-1 12 a4 4 0 0 1 -4 4 h-18 a4 4 0 0 1 -4 -4z" fill="#7A4B2A" stroke="none"/>` +
+      `<path d="M${x} ${b - 40} h44" stroke-width="4"/>` +
+      `<path d="M${x + 8} ${b - 40} V${b - 58} h28 V${b - 40}" fill="#C8CDD3"/>` +
+      `<rect x="${x + 6}" y="${b - 64}" width="32" height="7" rx="3" fill="#D8DEE3"/>`,
+  });
+
+  // Thêm cách nấu kiểu Việt cho các dụng cụ có sẵn.
+  Object.assign(TOOLS.thot.actions, { chat: 'Chặt miếng' });
+  Object.assign(TOOLS.to.actions, { ngam_muoi: 'Ngâm nước muối loãng', khu_mui: 'Khử mùi (chanh, muối, gừng)', pha_nuoc_cham: 'Pha nước chấm', muoi_dua: 'Muối dưa' });
+  Object.assign(TOOLS.dia.actions, { cuon: 'Cuốn' });
+  Object.assign(TOOLS.chao.actions, { thang_mau: 'Thắng nước màu', trang: 'Tráng (trứng, bánh)' });
+  Object.assign(TOOLS.noi.actions, { canh_chua: 'Nấu canh chua', chan: 'Chần / trụng', luoc_toi: 'Luộc chín tới' });
+  Object.assign(TOOLS.xung_hap.actions, { u: 'Ủ (xôi)' });
+  Object.assign(TOOLS.noi_com.actions, { u: 'Ủ (xôi)' });
+  TOOLS.coi.name = 'Cối đá';
+
   const STATIONS = TOOLS;
-  const CATS = ['prep', 'cook', 'bake'];
-  const CAT_NAMES = { prep: 'Sơ chế', cook: 'Nấu', bake: 'Làm bánh' };
+  const CATS = ['viet', 'prep', 'cook', 'bake'];
+  const CAT_NAMES = { viet: 'Bếp Việt', prep: 'Sơ chế', cook: 'Nấu', bake: 'Làm bánh' };
   // Thứ tự trên quầy: sơ chế bên trái, bếp ga ở giữa, đồ điện và lò bên phải.
-  const ORDER = ['thot', 'coi', 'to', 'ro', 'dia', 'can', 'ray', 'can_lan', 'tui_ban', 'khuon',
-    'chao', 'noi', 'xung_hap', 'am_dun', 'noi_com', 'noi_chien', 'may_xay', 'may_danh_trung', 'lo_nuong'];
-  const DEFAULT_TOOLS = ['thot', 'to', 'dia', 'chao', 'noi'];
+  const ORDER = ['thot_tron', 'thot', 'dao_phay', 'ban_nao', 'coi', 'to', 'ro_tre', 'ro', 'dia', 'can', 'ray', 'can_lan', 'tui_ban', 'khuon',
+    'chao', 'noi', 'noi_dat', 'noi_ap_suat', 'xung_hap', 'am_dun', 'dua_ca', 'bep_than', 'noi_lau',
+    'noi_com', 'noi_chien', 'may_xay', 'phin', 'may_danh_trung', 'lo_nuong'];
+  // Bộ mặc định cho bếp Việt.
+  const DEFAULT_TOOLS = ['thot_tron', 'to', 'ro_tre', 'chao', 'noi', 'noi_com'];
+  // Bộ mặc định cũ: dùng cho link gửi trước khi có danh sách dụng cụ, để hiển thị y như lúc gửi.
+  const LEGACY_TOOLS = ['thot', 'to', 'dia', 'chao', 'noi'];
   const HEAT = ['Không dùng lửa', 'Lửa nhỏ', 'Lửa vừa', 'Lửa lớn'];
 
   // Danh sách dụng cụ hợp lệ, không trùng, theo thứ tự trên quầy; luôn gồm các dụng cụ đang dùng trong bước.
-  function normalize(list, steps) {
+  function normalize(list, steps, fallback = DEFAULT_TOOLS) {
     const set = new Set((Array.isArray(list) ? list : []).filter((k) => typeof k === 'string' && TOOLS[k]));
-    if (!set.size) DEFAULT_TOOLS.forEach((k) => set.add(k));
+    if (!set.size) fallback.forEach((k) => set.add(k));
     (steps || []).forEach((s) => { if (s && TOOLS[s.s]) set.add(s.s); });
     return ORDER.filter((k) => set.has(k));
   }
 
   const MARGIN = 70, GAP = 30, MIN_W = 800;
+  const TRAY = 120; // bếp Việt: chừa chỗ bên trái cho mâm cơm
 
   // Vị trí từng dụng cụ trên quầy và bề rộng căn bếp.
-  function layout(tools) {
+  function layout(tools, theme) {
     const keys = normalize(tools);
+    const left = theme === 'modern' ? 0 : TRAY;
     const total = keys.reduce((s, k) => s + TOOLS[k].w, 0) + GAP * (keys.length - 1);
-    const W = Math.max(MIN_W, Math.round(total + MARGIN * 2));
-    let x = (W - total) / 2;
+    const W = Math.max(MIN_W, Math.round(total + MARGIN * 2 + left));
+    let x = left + (W - left - total) / 2;
     const pos = {};
     keys.forEach((k) => {
       const t = TOOLS[k];
@@ -299,6 +410,85 @@
 `;
   }
 
+  // ---------- Căn bếp Việt ----------
+  // Tường gạch bông, cửa sổ chớp xanh, kệ gia vị (nước mắm, tương ớt, mỡ hành),
+  // chùm tỏi và ớt treo, rổ rá treo tường, đèn.
+  function backdropViet(W, id) {
+    const win = W / 2;
+    const bottleOn = (x, body, cap, h) =>
+      `<rect x="${x + 5}" y="${110 - h - 8}" width="8" height="6" rx="1.5" fill="${cap}"/>` +
+      `<path d="M${x + 5} ${110 - h - 2} h8 v4 c0 2 5 3 5 7 V${108} a2 2 0 0 1 -2 2 H${x + 2} a2 2 0 0 1 -2 -2 V${110 - h + 9} c0 -4 5 -5 5 -7z" fill="${body}"/>`;
+    const garlic = (cx, cy) => `<path d="M${cx} ${cy - 7} C${cx + 8} ${cy - 2} ${cx + 8} ${cy + 7} ${cx} ${cy + 7} C${cx - 8} ${cy + 7} ${cx - 8} ${cy - 2} ${cx} ${cy - 7}Z" fill="#F7F1E5"/>`;
+    const chili = (x, y, a) => `<path d="M${x} ${y} c4 2 6 10 2 18 c-3 -6 -5 -12 -2 -18z" transform="rotate(${a} ${x} ${y})" fill="#E63946"/>`;
+    const basket = (cx, cy, r) =>
+      `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#E3C08A"/><circle cx="${cx}" cy="${cy}" r="${r - 6}" fill="#F0D7A8"/>` +
+      `<path d="M${cx - r + 4} ${cy} H${cx + r - 4} M${cx} ${cy - r + 4} V${cy + r - 4} M${cx - r * 0.6} ${cy - r * 0.6} L${cx + r * 0.6} ${cy + r * 0.6} M${cx + r * 0.6} ${cy - r * 0.6} L${cx - r * 0.6} ${cy + r * 0.6}" stroke-width="1.2" opacity=".45"/>`;
+    const rightDecor = W - 150 > win + 230;
+    return `
+  <defs>
+    <linearGradient id="${id}sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#BFE3F2"/><stop offset="1" stop-color="#FFE6BF"/>
+    </linearGradient>
+    <pattern id="${id}tile" width="30" height="30" patternUnits="userSpaceOnUse">
+      <rect width="30" height="30" fill="#F4EBDD"/>
+      <path d="M15 4 L19 11 L26 15 L19 19 L15 26 L11 19 L4 15 L11 11Z" fill="#5B8DB8" opacity=".75"/>
+      <circle cx="15" cy="15" r="3" fill="#E9967A"/>
+      <path d="M0 0 h5 a5 5 0 0 1 -5 5z M30 0 v5 a5 5 0 0 1 -5 -5z M0 30 v-5 a5 5 0 0 1 5 5z M30 30 h-5 a5 5 0 0 1 5 -5z" fill="#C9744A" opacity=".7"/>
+      <path d="M30 0 V30 H0" fill="none" stroke="#E6D6BE" stroke-width="1.5"/>
+    </pattern>
+  </defs>
+  <rect width="${W}" height="340" fill="#FBF0DF"/>
+  <rect y="150" width="${W}" height="112" fill="url(#${id}tile)"/>
+  <g stroke="${O}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <rect x="${win - 78}" y="26" width="156" height="110" rx="6" fill="#8B5E3C"/>
+    <rect x="${win - 68}" y="36" width="136" height="90" rx="3" fill="url(#${id}sky)"/>
+    <circle cx="${win + 36}" cy="60" r="12" fill="#FFF4D6" stroke="none"/>
+    <path d="M${win - 54} 126 q10 -22 24 -18 q14 -16 26 2 q16 -10 22 16z" fill="#81B29A" stroke-width="2"/>
+    <path d="M${win} 36 V126" stroke="#8B5E3C" stroke-width="5"/>
+    <rect x="${win - 128}" y="28" width="50" height="106" rx="4" fill="#5E9C76"/>
+    <rect x="${win + 78}" y="28" width="50" height="106" rx="4" fill="#5E9C76"/>
+    <path d="${[42, 54, 66, 78, 90, 102, 114, 124].map((y) => `M${win - 122} ${y} h38 M${win + 84} ${y} h38`).join(' ')}" stroke="#3F7A5C" stroke-width="2"/>
+    <rect x="${win - 86}" y="134" width="172" height="8" rx="3" fill="#8B5E3C"/>
+
+    <rect x="34" y="110" width="210" height="8" rx="3" fill="#8B5E3C"/>
+    <path d="M44 110 v14 M234 110 v14" stroke-width="3"/>
+    ${bottleOn(50, '#E7A64B', '#C0392B', 44)}
+    ${bottleOn(78, '#E63946', '#7BC47F', 38)}
+    <rect x="108" y="82" width="30" height="28" rx="7" fill="#C8E6A0"/><rect x="106" y="76" width="34" height="8" rx="3" fill="#E07A5F"/>
+    <rect x="150" y="88" width="24" height="22" rx="6" fill="#FDF6F0"/><rect x="148" y="83" width="28" height="7" rx="3" fill="#81B29A"/>
+    <path d="M196 110 l-4 -18 h26 l-4 18z" fill="#C9744A"/>
+    <path d="M205 92 q-16 -6 -16 -22 q14 2 16 22 q0 -18 14 -26 q6 16 -14 26" fill="#81B29A"/>
+
+    <path d="M${win + 150} 18 V40 M${win + 176} 18 V36" stroke-width="2"/>
+    ${[[0, 46], [-6, 58], [6, 60], [0, 72], [-5, 84], [5, 86]].map(([dx, dy]) => garlic(win + 150 + dx, dy)).join('')}
+    ${[[-6, 38, 20], [0, 40, 0], [6, 38, -20], [-3, 52, 12], [4, 54, -10]].map(([dx, y, a]) => chili(win + 176 + dx, y, a)).join('')}
+    <path d="M${win + 172} 36 l4 -4 l4 4" stroke="#4E8F4E" stroke-width="2.5"/>
+
+    ${rightDecor ? basket(W - 250, 70, 30) + basket(W - 208, 104, 22) : ''}
+    <path d="M${W - 120} 0 V40" stroke-width="2.5"/>
+  </g>
+  <circle cx="${W - 120}" cy="74" r="58" fill="#FFE8A3" opacity=".3"/>
+  <g stroke="${O}" stroke-width="3" stroke-linejoin="round">
+    <path d="M${W - 146} 70 C${W - 146} 50 ${W - 94} 50 ${W - 94} 70Z" fill="#E9967A"/>
+    <circle cx="${W - 120}" cy="74" r="6" fill="#FFF4C2"/>
+  </g>`;
+  }
+
+  // Mâm cơm ở góc trái quầy: mâm tròn, chén cơm, đĩa rau, đôi đũa.
+  function tray() {
+    const bowl = (cx) =>
+      `<path d="M${cx - 12} 244 h24 c0 10 -5 14 -12 14 c-7 0 -12 -4 -12 -14z" fill="#FFFFFF"/>` +
+      `<path d="M${cx - 12} 248 h24" stroke="#5B8DB8" stroke-width="2"/>` +
+      `<path d="M${cx - 10} 244 c2 -8 18 -8 20 0z" fill="#FFFDF5" stroke-width="2"/>`;
+    return `<g class="tray" stroke="${O}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="78" cy="258" rx="62" ry="7" fill="#B5603A"/>
+    ${bowl(42)}${bowl(112)}
+    <path d="M60 252 h36 q-4 6 -18 6 q-14 0 -18 -6z" fill="#FFFFFF"/>
+    <path d="M64 252 q4 -10 10 -2 q4 -10 10 -2 q4 -10 10 -1" fill="#7BC47F" stroke-width="2"/>
+    <path d="M52 238 L76 224 M56 240 L80 226" stroke="#C98B5B" stroke-width="3"/>
+  </g>`;
+  }
+
   // Tủ bếp và mặt quầy: vẽ sau Chef để che phần thân dưới quầy.
   function cabinet(W) {
     let doors = '';
@@ -317,16 +507,25 @@
   }
 
   // Chef đứng sau quầy, cạnh dụng cụ đang dùng (không che bong bóng nguyên liệu).
+  // Chọn bên trái hoặc phải dụng cụ đang dùng, ưu tiên bên có đồ thấp hơn để Chef không bị che mặt.
   function chefX(L, active) {
     const p = L.pos[active];
     if (!p) return L.W / 2;
-    const right = p.x + p.t.w + 62;
-    return right <= L.W - 60 ? right : Math.max(60, p.x - 62);
+    const cost = (cx) => L.keys.reduce((sum, k) => {
+      const q = L.pos[k];
+      const overlap = Math.min(cx + 40, q.x + q.t.w) - Math.max(cx - 40, q.x);
+      return overlap > 0 ? sum + overlap * (COUNTER - q.top) : sum;
+    }, 0);
+    const options = [p.x + p.t.w + 62, p.x - 62].filter((cx) => cx >= 60 && cx <= L.W - 60);
+    if (!options.length) return Math.min(L.W - 60, Math.max(60, p.cx));
+    return options.reduce((best, cx) => (cost(cx) < cost(best) ? cx : best));
   }
 
   // Trả về { svg, w (bề rộng căn bếp), focus (tọa độ x cần nhìn tới) }.
-  function scene({ tools, active = null, heat = 0, temp = 0, items = [], interactive = false, chef = null } = {}) {
-    const L = layout(tools);
+  // theme: 'viet' (mặc định, bếp Việt) hoặc 'modern' (bếp hiện đại).
+  function scene({ tools, active = null, heat = 0, temp = 0, items = [], interactive = false, chef = null, theme = 'viet' } = {}) {
+    const viet = theme !== 'modern';
+    const L = layout(tools, theme);
     const W = L.W;
     const id = 'k' + ++uid;
     if (!L.pos[active]) active = null;
@@ -339,9 +538,17 @@
       if (!p.t.stove) return;
       const bw = p.t.body + 24;
       const sx = p.cx - bw / 2;
-      stoves += `<rect x="${sx}" y="254" width="${bw}" height="8" rx="2" fill="${O}"/>` +
-        `<path d="M${sx + 14} ${GRATE} V254 M${sx + bw - 14} ${GRATE} V254" stroke-width="4"/>` +
-        `<circle cx="${p.cx - 10}" cy="296" r="4.5" fill="#F2CC8F" class="knob"/><circle cx="${p.cx + 10}" cy="296" r="4.5" fill="#F2CC8F" class="knob"/>`;
+      if (viet) {
+        // Bếp ga đặt trên quầy: thân bếp có núm vặn phía trước, kiềng ba chân.
+        stoves += `<rect x="${sx - 2}" y="246" width="${bw + 4}" height="16" rx="4" fill="#3E3A44"/>` +
+          `<path d="M${sx + 2} 250 h${bw - 4}" stroke="#6F6787" stroke-width="2"/>` +
+          `<circle cx="${p.cx - bw / 4}" cy="255" r="4" fill="#E8D4C2" class="knob"/><circle cx="${p.cx + bw / 4}" cy="255" r="4" fill="#E8D4C2" class="knob"/>` +
+          `<path d="M${sx + 12} ${GRATE} V246 M${sx + bw - 12} ${GRATE} V246 M${p.cx} ${GRATE} V246" stroke-width="3.5"/>`;
+      } else {
+        stoves += `<rect x="${sx}" y="254" width="${bw}" height="8" rx="2" fill="${O}"/>` +
+          `<path d="M${sx + 14} ${GRATE} V254 M${sx + bw - 14} ${GRATE} V254" stroke-width="4"/>` +
+          `<circle cx="${p.cx - 10}" cy="296" r="4.5" fill="#F2CC8F" class="knob"/><circle cx="${p.cx + 10}" cy="296" r="4.5" fill="#F2CC8F" class="knob"/>`;
+      }
     });
 
     const tools_ = L.keys.map((k) => {
@@ -360,7 +567,7 @@
       if (ap.t.stove && heat > 0) {
         fire = flames(ap.cx, ap.t.body, heat);
         vapor = steam(ap.cx, ap.top - 4);
-      } else if (['noi_com', 'noi_chien'].includes(active) || (active === 'lo_nuong' && temp)) {
+      } else if (['noi_com', 'noi_chien', 'noi_lau'].includes(active) || (active === 'lo_nuong' && temp) || (active === 'bep_than' && heat > 0)) {
         vapor = steam(ap.cx, ap.top - 4);
       }
     }
@@ -392,9 +599,10 @@
 
     const svg = `
 <svg class="kitchen-svg" viewBox="0 18 ${W} ${SCENE_H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${label}">
-  ${backdrop(W, id)}
+  ${viet ? backdropViet(W, id) : backdrop(W, id)}
   ${chefSvg}
   ${cabinet(W)}
+  ${viet ? tray() : ''}
   ${glow}
   <g stroke="${O}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">${stoves}</g>
   ${fire}
@@ -415,5 +623,8 @@
     return `<svg class="tool-icon" viewBox="0 0 ${box} ${box}" aria-hidden="true"><g fill="none" stroke="${O}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">${t.draw(x, b, false)}</g></svg>`;
   }
 
-  window.Kitchen = { TOOLS, STATIONS, CATS, CAT_NAMES, ORDER, DEFAULT_TOOLS, HEAT, SCENE_H, normalize, layout, scene, toolSVG };
+  // Dụng cụ có chọn mức lửa: đặt trên bếp ga, hoặc tự có nguồn nhiệt (bếp than, nồi lẩu điện).
+  const hasHeat = (k) => !!(TOOLS[k] && (TOOLS[k].stove || TOOLS[k].fire));
+
+  window.Kitchen = { TOOLS, STATIONS, CATS, CAT_NAMES, ORDER, DEFAULT_TOOLS, LEGACY_TOOLS, HEAT, SCENE_H, normalize, layout, scene, toolSVG, hasHeat };
 })();

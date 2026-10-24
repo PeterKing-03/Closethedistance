@@ -72,6 +72,8 @@
       m: str(raw.m, 600),
       e: str(raw.e, 600),
       c: Chef.sanitize(raw.c),
+      // Kiểu bếp: bếp Việt (mặc định) hoặc bếp hiện đại.
+      th: raw.th === 'm' || raw.th === 'modern' ? 'modern' : 'viet',
       i: [],
       st: [],
     };
@@ -103,7 +105,7 @@
       const step = { s: x.s, a: Object.prototype.hasOwnProperty.call(S.actions, x.a) ? x.a : '' };
       step.g = [...new Set((Array.isArray(x.g) ? x.g : []).map((n) => n | 0))].filter((n) => n >= 0 && n < r.i.length);
       // Mức lửa chỉ áp dụng cho dụng cụ đặt trên bếp ga (chảo, nồi, xửng hấp, ấm).
-      step.h = S.stove ? Math.max(0, Math.min(3, x.h | 0)) : 0;
+      step.h = Kitchen.hasHeat(x.s) ? Math.max(0, Math.min(3, x.h | 0)) : 0;
       const t = Number(x.t);
       step.t = isFinite(t) && t > 0 ? Math.min(600, Math.round(t * 2) / 2) : 0;
       // Nhiệt độ (°C) cho lò nướng, nồi chiên không dầu.
@@ -118,7 +120,7 @@
       r.st.push(step);
     });
     // Dụng cụ trên bếp (link cũ không có thì dùng bộ mặc định), luôn gồm dụng cụ dùng trong các bước.
-    r.k = Kitchen.normalize(raw.k, r.st);
+    r.k = Kitchen.normalize(raw.k, r.st, Kitchen.LEGACY_TOOLS);
     return r;
   }
 

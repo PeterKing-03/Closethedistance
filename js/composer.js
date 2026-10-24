@@ -15,7 +15,9 @@
   const INTRO_KEY = 'ctd-intro-seen-v1';
   const savedChef = () => Chef.sanitize(store.get(CHEF_KEY, null));
   const savedTools = () => Kitchen.normalize(store.get(TOOLS_KEY, null));
-  const blank = () => ({ t: '', to: '', f: '', m: '', e: '', c: savedChef(), k: savedTools(), i: [], st: [] });
+  const THEME_KEY = 'ctd-theme-v1';
+  const savedTheme = () => (store.get(THEME_KEY, 'viet') === 'modern' ? 'modern' : 'viet');
+  const blank = () => ({ t: '', to: '', f: '', m: '', e: '', c: savedChef(), k: savedTools(), th: savedTheme(), i: [], st: [] });
   // p: thành phẩm của các bước trước dùng trong bước này; o: tên thành phẩm của bước này.
   const blankStep = () => ({ s: null, a: '', g: [], p: [], h: 0, d: 0, t: '', n: '', o: '' });
 
@@ -40,6 +42,7 @@
       if (!d.t) r.t = '';
       if (!d.c) r.c = savedChef();
       if (!d.k) r.k = Kitchen.normalize(savedTools(), r.st);
+      if (!d.th) r.th = savedTheme();
       return r;
     } catch (e) { return blank(); }
   }
@@ -170,13 +173,21 @@
 
   // Đơn vị gợi ý sẵn theo loại nguyên liệu.
   const DEFAULT_UNIT = {
-    trung: 'qua', ca_chua: 'qua', chanh: 'qua', ot: 'qua', dua_leo: 'qua', bap: 'qua',
-    toi: 'tep', hanh_tim: 'cu', hanh_la: 'cong', sa: 'cong', gung: 'lat', rau_cai: 'bo',
+    trung: 'qua', ca_chua: 'qua', chanh: 'trai', ot: 'trai', dua_leo: 'trai', bap: 'trai',
+    toi: 'tep', hanh_tim: 'cu', hanh_la: 'cong', sa: 'cong', gung: 'nhanh', rau_cai: 'bo',
     nuoc_mam: 'tbsp', nuoc_tuong: 'tbsp', dau_an: 'tbsp',
     muoi: 'tsp', duong: 'tsp', tieu: 'tsp', hat_nem: 'tsp',
     sua: 'ml', nuoc: 'ml', gao: 'cup',
     long_do: 'qua', long_trang: 'qua', kem_tuoi: 'ml', banh_quy: 'mieng', ca_phe: 'ml',
     cacao: 'tbsp', men_no: 'tsp', vani: 'tsp',
+    // Bếp Việt
+    bot_ngot: 'tsp', dau_hao: 'tbsp', tuong_ot: 'tbsp', sa_te: 'tsp', mam_tom: 'tsp', mam_ruoc: 'tbsp', giam: 'tbsp',
+    me: 'trai', nuoc_mau: 'tbsp', ngu_vi: 'tsp', que: 'mieng', hoa_hoi: 'qua', thao_qua: 'trai', duong_phen: 'g',
+    bot_nghe: 'tsp', dau_dieu: 'tbsp', me_rang: 'tbsp', dau_phong: 'tbsp', hanh_phi: 'tbsp', nuoc_cot_dua: 'ml',
+    rau_ram: 'nam', ngo_ri: 'nam', ngo_gai: 'nam', hung_que: 'nam', tia_to: 'nam', kinh_gioi: 'nam', thi_la: 'nam',
+    la_chanh: 'la', la_lot: 'nam', he: 'bo', gia_do: 'nam', rau_muong: 'bo', bi_do: 'g', kho_qua: 'trai', dau_bap: 'trai',
+    ba_chi: 'lang', suon: 'lang', muc: 'con', ngheu: 'g', cua: 'con', gio_lua: 'lang',
+    bun: 'g', banh_pho: 'g', mien: 'g', banh_trang: 'goi', banh_mi: 'qua', gao_nep: 'bat', bot_nang: 'tbsp', bot_chien: 'g',
   };
 
   // Ô nhập số + menu chọn đơn vị (g, kg, ml, muỗng canh, quả...).
@@ -230,7 +241,7 @@
     const tabs = h('div', { class: 'tabs', role: 'tablist' });
     const grid = h('div', { class: 'icon-grid' });
     const cats = Icons.cats.map((c) => ({ key: c.key, name: L.cat(c.key) })).concat([{ key: 've', name: t('picker.drawn') }]);
-    let cur = 'rau';
+    let cur = Icons.cats[0].key;
 
     function count(k) { return state.i.filter((x) => x.k === k).length; }
 
@@ -317,14 +328,36 @@
       const st = e.target.closest('[data-station]');
       if (st && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); selectStation(st.dataset.station); }
     });
+    els.themeRow = h('div', { class: 'theme-row' });
+    renderTheme();
     return h('section', { class: 'card', id: 'kitchen-card' },
       cardHead(4, t('kitchen.title')),
       h('p', { class: 'muted' }, t('kitchen.help')),
+      els.themeRow,
       els.scene,
       els.builder,
       h('h3', { class: 'sub-head' }, t('steps.title')),
       h('p', { class: 'field-hint' }, t('steps.hint')),
       els.steps);
+  }
+
+  // Kiểu bếp: Bếp Việt (mặc định) hoặc Bếp hiện đại. Ghi nhớ cho lần sau và gửi kèm trong link.
+  function renderTheme() {
+    els.themeRow.innerHTML = '';
+    els.themeRow.append(
+      h('span', { class: 'field-label' }, t('theme.label')),
+      h('div', { class: 'seg', role: 'group', 'aria-label': t('theme.label') },
+        ['viet', 'modern'].map((v) => h('button', {
+          type: 'button', class: state.th === v ? 'on' : '', 'aria-pressed': state.th === v ? 'true' : 'false',
+          onclick: () => {
+            if (state.th === v) return;
+            state.th = v;
+            store.set(THEME_KEY, v);
+            save();
+            renderTheme();
+            renderScene();
+          },
+        }, t('theme.' + v)))));
   }
 
   // Căn bếp luôn dính ở đầu mục khi cuộn, hiển thị bước đang soạn hoặc đang xem lại.
@@ -343,7 +376,7 @@
     els.scene.innerHTML = '';
     els.scene.append(
       C.kitchenView({
-        tools: state.k,
+        tools: state.k, theme: state.th,
         active: step ? step.s : null, heat: step ? step.h : 0, temp: step ? step.d : 0,
         items: step ? C.stepGraphics(step, state.st, state.i) : [], interactive: true,
         chef: { c: state.c, mood: Chef.moodFor(step) },
@@ -431,7 +464,7 @@
     viewing = null;
     builder.s = key;
     if (!Object.prototype.hasOwnProperty.call(S[key].actions, builder.a)) builder.a = '';
-    builder.h = S[key].stove ? (builder.h || 2) : 0;
+    builder.h = Kitchen.hasHeat(key) ? (builder.h || 2) : 0;
     builder.d = S[key].temp ? (builder.d || 180) : 0;
     renderBuilder();
   }
@@ -489,7 +522,7 @@
       prevChips ? h('span', { class: 'group-sub' }, t('builder.raw')) : null, ingChips,
       prevChips ? h('span', { class: 'group-sub' }, t('builder.prev')) : null, prevChips));
 
-    if (st.stove) {
+    if (Kitchen.hasHeat(b.s)) {
       panel.append(h('div', { class: 'group' }, h('span', { class: 'field-label' }, t('builder.heat')),
         h('div', { class: 'chips' }, [1, 2, 3, 0].map((lv) => chip(L.heat(lv), b.h === lv, () => { b.h = lv; renderBuilder(); })))));
     }
@@ -653,6 +686,7 @@
 
   function payload() {
     const p = { v: 1, t: state.t.trim(), c: state.c, k: state.k };
+    if (state.th === 'modern') p.th = 'm';
     ['to', 'f', 'm', 'e'].forEach((k) => { if (state[k].trim()) p[k] = state[k].trim(); });
     p.i = state.i.map((ing) => {
       const o = {};
