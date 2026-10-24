@@ -126,9 +126,39 @@
   }
 
   // ---------- Phần 2: recipe ----------
+  // ---------- Recipe món Việt mẫu ----------
+  function templateBox() {
+    return h('div', { class: 'tpl-box' },
+      h('div', { class: 'tpl-title' }, t('tpl.title')),
+      h('div', { class: 'tpl-list' }, Templates.LIST.map((tpl) =>
+        h('button', { class: 'tpl-item', type: 'button', onclick: () => loadTemplate(tpl) },
+          h('span', { class: 'tpl-pic', html: Icons.svg(tpl.icon) }),
+          h('span', {}, tpl.name[L.lang] || tpl.name.vi)))),
+      h('p', { class: 'field-hint' }, t('tpl.hint')));
+  }
+
+  // Nạp món mẫu: giữ Chef, tên Chef, người nhận, kiểu bếp; thay tên món, nguyên liệu, dụng cụ, các bước.
+  function loadTemplate(tpl) {
+    const name = tpl.name[L.lang] || tpl.name.vi;
+    const busy = state.i.length || state.st.length || state.t.trim();
+    if (busy && !confirm(t('tpl.confirm', { name }))) return;
+    const r = C.sanitize(tpl.build(L.lang));
+    state = Object.assign(r, { c: state.c, f: state.f, to: state.to, th: state.th, m: state.m, e: state.e });
+    builder = blankStep();
+    editing = null;
+    viewing = null;
+    clearTimeout(saveTimer);
+    store.set(DRAFT_KEY, state);
+    build();
+    toast(t('tpl.loaded', { name }));
+    const ing = els.ingList && els.ingList.closest('.card');
+    if (ing) ing.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   function infoSection() {
     return h('section', { class: 'card' },
       cardHead(2, t('recipe.title')),
+      templateBox(),
       field(t('recipe.dish'), bindText('t', 'input', { type: 'text', maxlength: 80, placeholder: t('recipe.dishPh'), id: 'f-title' })),
       field(t('recipe.to'), bindText('to', 'input', { type: 'text', maxlength: 40, placeholder: t('recipe.toPh') })),
       field(t('recipe.msg'), bindText('m', 'textarea', { rows: 3, maxlength: 600, class: 'hand', placeholder: t('recipe.msgPh') })));

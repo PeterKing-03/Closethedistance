@@ -287,7 +287,7 @@
 
   // Thêm cách nấu kiểu Việt cho các dụng cụ có sẵn.
   Object.assign(TOOLS.thot.actions, { chat: 'Chặt miếng' });
-  Object.assign(TOOLS.to.actions, { ngam_muoi: 'Ngâm nước muối loãng', khu_mui: 'Khử mùi (chanh, muối, gừng)', pha_nuoc_cham: 'Pha nước chấm', muoi_dua: 'Muối dưa' });
+  Object.assign(TOOLS.to.actions, { ngam_muoi: 'Ngâm nước muối loãng', khu_mui: 'Khử mùi (chanh, muối, gừng)', pha_nuoc_cham: 'Pha nước chấm', muoi_dua: 'Muối dưa', bay_to: 'Cho ra tô' });
   Object.assign(TOOLS.dia.actions, { cuon: 'Cuốn' });
   Object.assign(TOOLS.chao.actions, { thang_mau: 'Thắng nước màu', trang: 'Tráng (trứng, bánh)' });
   Object.assign(TOOLS.noi.actions, { canh_chua: 'Nấu canh chua', chan: 'Chần / trụng', luoc_toi: 'Luộc chín tới' });
