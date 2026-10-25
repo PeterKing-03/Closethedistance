@@ -436,21 +436,23 @@
       <path d="M0 0 h5 a5 5 0 0 1 -5 5z M30 0 v5 a5 5 0 0 1 -5 -5z M0 30 v-5 a5 5 0 0 1 5 5z M30 30 h-5 a5 5 0 0 1 5 -5z" fill="#C9744A" opacity=".7"/>
       <path d="M30 0 V30 H0" fill="none" stroke="#E6D6BE" stroke-width="1.5"/>
     </pattern>
+    ${woodPattern(`${id}woodS`, '#6E4024', '#4F2C16', 140, 10, false)}
+    ${woodPattern(`${id}woodF`, '#7A4A2A', '#55301A', 160, 30)}
   </defs>
   <rect width="${W}" height="340" fill="#FBF0DF"/>
   <rect y="150" width="${W}" height="112" fill="url(#${id}tile)"/>
   <g stroke="${O}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-    <rect x="${win - 78}" y="26" width="156" height="110" rx="6" fill="#8B5E3C"/>
+    <rect x="${win - 78}" y="26" width="156" height="110" rx="6" fill="url(#${id}woodF)"/>
     <rect x="${win - 68}" y="36" width="136" height="90" rx="3" fill="url(#${id}sky)"/>
     <circle cx="${win + 36}" cy="60" r="12" fill="#FFF4D6" stroke="none"/>
     <path d="M${win - 54} 126 q10 -22 24 -18 q14 -16 26 2 q16 -10 22 16z" fill="#81B29A" stroke-width="2"/>
-    <path d="M${win} 36 V126" stroke="#8B5E3C" stroke-width="5"/>
+    <path d="M${win} 36 V126" stroke="#6E4024" stroke-width="5"/>
     <rect x="${win - 128}" y="28" width="50" height="106" rx="4" fill="#5E9C76"/>
     <rect x="${win + 78}" y="28" width="50" height="106" rx="4" fill="#5E9C76"/>
     <path d="${[42, 54, 66, 78, 90, 102, 114, 124].map((y) => `M${win - 122} ${y} h38 M${win + 84} ${y} h38`).join(' ')}" stroke="#3F7A5C" stroke-width="2"/>
-    <rect x="${win - 86}" y="134" width="172" height="8" rx="3" fill="#8B5E3C"/>
+    <rect x="${win - 86}" y="134" width="172" height="8" rx="3" fill="url(#${id}woodS)"/>
 
-    <rect x="34" y="110" width="210" height="8" rx="3" fill="#8B5E3C"/>
+    <rect x="34" y="110" width="210" height="8" rx="3" fill="url(#${id}woodS)"/>
     <path d="M44 110 v14 M234 110 v14" stroke-width="3"/>
     ${bottleOn(50, '#E7A64B', '#C0392B', 44)}
     ${bottleOn(78, '#E63946', '#7BC47F', 38)}
@@ -490,19 +492,48 @@
   }
 
   // Tủ bếp và mặt quầy: vẽ sau Chef để che phần thân dưới quầy.
-  function cabinet(W) {
+  // Vân gỗ cho bếp Việt: nền gỗ nâu gụ, các thớ gỗ uốn lượn và vài mắt gỗ.
+  // base: màu gỗ, grain: màu thớ; w/h: kích thước một ô lặp lại.
+  function woodPattern(pid, base, grain, w, h, knot = true) {
+    const rows = Math.max(2, Math.round(h / 10));
+    let lines = '';
+    for (let r = 0; r < rows; r++) {
+      const y = ((r + 0.5) * h) / rows;
+      const a = (r % 2 ? 1 : -1) * Math.min(3, h / 8);
+      lines += `<path d="M0 ${y} C${w * 0.25} ${y + a} ${w * 0.5} ${y - a} ${w * 0.75} ${y + a * 0.6} S${w} ${y - a * 0.4} ${w} ${y}" />`;
+    }
+    const knots = knot
+      ? `<ellipse cx="${w * 0.68}" cy="${h * 0.5}" rx="${Math.min(9, w / 14)}" ry="${Math.min(3.6, h / 5)}" />` +
+        `<ellipse cx="${w * 0.68}" cy="${h * 0.5}" rx="${Math.min(4.5, w / 28)}" ry="${Math.min(1.6, h / 10)}" />`
+      : '';
+    return `<pattern id="${pid}" width="${w}" height="${h}" patternUnits="userSpaceOnUse">
+      <rect width="${w}" height="${h}" fill="${base}"/>
+      <g fill="none" stroke="${grain}" stroke-width="1.4" stroke-linecap="round" opacity=".7">${lines}${knots}</g>
+    </pattern>`;
+  }
+
+  function cabinet(W, viet, id) {
     let doors = '';
     const n = Math.max(2, Math.round((W - 40) / 200));
     const dw = (W - 40 - (n - 1) * 12) / n;
+    // Bếp Việt: gỗ nâu gụ đậm có vân; bếp hiện đại: gỗ sáng trơn như cũ.
+    const c = viet
+      ? { body: `url(#${id}woodB)`, door: `url(#${id}woodD)`, top: `url(#${id}woodT)`, handle: '#F2CC8F' }
+      : { body: '#C98B5B', door: '#D59A69', top: '#E3B07F', handle: O };
     for (let i = 0; i < n; i++) {
       const dx = 20 + i * (dw + 12);
-      doors += `<rect x="${dx}" y="288" width="${dw}" height="44" rx="5" fill="#D59A69"/>` +
-        `<path d="M${dx + (i % 2 ? 12 : dw - 12)} 304 v12" stroke-width="3.5"/>`;
+      doors += `<rect x="${dx}" y="288" width="${dw}" height="44" rx="5" fill="${c.door}"/>` +
+        (viet ? `<rect x="${dx + 6}" y="294" width="${dw - 12}" height="32" rx="3" fill="none" stroke="#4F2F18" stroke-width="1.6" opacity=".55"/>` : '') +
+        `<path d="M${dx + (i % 2 ? 12 : dw - 12)} 304 v12" stroke="${c.handle}" stroke-width="3.5"/>`;
     }
-    return `<g class="cabinet" stroke="${O}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-    <rect x="-4" y="276" width="${W + 8}" height="70" fill="#C98B5B"/>
+    const defs = viet
+      ? `<defs>${woodPattern(`${id}woodB`, '#6E4024', '#4F2C16', 180, 70)}${woodPattern(`${id}woodD`, '#8A5530', '#5E3519', 160, 44)}${woodPattern(`${id}woodT`, '#5E3820', '#3E2412', 220, 14, false)}</defs>`
+      : '';
+    return `${defs}<g class="cabinet" stroke="${O}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <rect x="-4" y="276" width="${W + 8}" height="70" fill="${c.body}"/>
     ${doors}
-    <rect x="-4" y="262" width="${W + 8}" height="14" fill="#E3B07F"/>
+    <rect x="-4" y="262" width="${W + 8}" height="14" fill="${c.top}"/>
+    ${viet ? `<path d="M-4 265 H${W + 4}" stroke="#8A5530" stroke-width="1.5" opacity=".8"/>` : ''}
   </g>`;
   }
 
@@ -601,7 +632,7 @@
 <svg class="kitchen-svg" viewBox="0 18 ${W} ${SCENE_H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${label}">
   ${viet ? backdropViet(W, id) : backdrop(W, id)}
   ${chefSvg}
-  ${cabinet(W)}
+  ${cabinet(W, viet, id)}
   ${viet ? tray() : ''}
   ${glow}
   <g stroke="${O}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">${stoves}</g>
