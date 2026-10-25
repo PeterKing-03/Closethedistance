@@ -34,7 +34,12 @@
     render();
   }
 
-  window.App = { logo, intro };
+  // Nền trang theo kiểu bếp: Bếp Việt có hoa văn gạch bông, Bếp hiện đại nền trơn.
+  function setTheme(th) {
+    document.body.classList.toggle('theme-viet', th !== 'modern');
+  }
+
+  window.App = { logo, intro, setTheme };
 
   function route() {
     const root = document.getElementById('app');

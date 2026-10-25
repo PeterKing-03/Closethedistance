@@ -382,6 +382,7 @@
           onclick: () => {
             if (state.th === v) return;
             state.th = v;
+            App.setTheme(v);
             store.set(THEME_KEY, v);
             save();
             renderTheme();
@@ -829,6 +830,7 @@
     els = { root };
     root.innerHTML = '';
     root.className = 'compose';
+    App.setTheme(state.th);
     document.title = 'Close the distance';
     els.heroTitle = h('h1', {});
     root.append(
@@ -866,6 +868,7 @@
 
   function mount(root) {
     state = loadDraft();
+    App.setTheme(state.th);
     builder = blankStep();
     editing = null;
     viewing = null;

@@ -712,3 +712,23 @@ button.chip:hover { border-color: var(--mustard); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- Nền hoa văn khi chọn Bếp Việt ----------
+   Gạch bông nét mảnh, độ đậm rất thấp; các thẻ nội dung vẫn trắng trơn nên chữ dễ đọc.
+   Bếp hiện đại giữ nền trơn. */
+body { transition: background-color .3s ease; }
+body.theme-viet {
+  --bg: #FBF3E6;
+  background-color: #FBF3E6;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'96'%20height%3D'96'%20viewBox%3D'0%200%2096%2096'%3E%20%3Cg%20fill%3D'none'%20stroke%3D'%23C9744A'%20stroke-width%3D'1.2'%20opacity%3D'.22'%3E%20%3Cpath%20d%3D'M48%2022%20C56%2034%2062%2040%2074%2048%20C62%2056%2056%2062%2048%2074%20C40%2062%2034%2056%2022%2048%20C34%2040%2040%2034%2048%2022Z'%2F%3E%20%3Ccircle%20cx%3D'48'%20cy%3D'48'%20r%3D'5'%2F%3E%20%3Cpath%20d%3D'M0%2012%20A12%2012%200%200%200%2012%200%20M84%200%20A12%2012%200%200%200%2096%2012%20M96%2084%20A12%2012%200%200%200%2084%2096%20M12%2096%20A12%2012%200%200%200%200%2084'%2F%3E%20%3C%2Fg%3E%20%3Cg%20fill%3D'%235B8DB8'%20opacity%3D'.12'%3E%3Ccircle%20cx%3D'48'%20cy%3D'48'%20r%3D'2.2'%2F%3E%3Ccircle%20cx%3D'0'%20cy%3D'0'%20r%3D'3'%2F%3E%3Ccircle%20cx%3D'96'%20cy%3D'0'%20r%3D'3'%2F%3E%3Ccircle%20cx%3D'0'%20cy%3D'96'%20r%3D'3'%2F%3E%3Ccircle%20cx%3D'96'%20cy%3D'96'%20r%3D'3'%2F%3E%3C%2Fg%3E%20%3C%2Fsvg%3E");
+  background-size: 96px 96px;
+}
+/* Thanh nút dưới cùng: bỏ dải màu trơn để không che hoa văn (các nút vẫn nền đặc nên dễ đọc). */
+body.theme-viet .actionbar,
+body.theme-viet .cook-nav { background: none; }
+/* Thanh căn bếp dính ở đầu màn hình nấu: kính mờ, vẫn thấy hoa văn phía sau. */
+body.theme-viet .cook-stage {
+  background: rgba(251, 243, 230, .82);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}

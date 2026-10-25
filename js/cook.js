@@ -309,6 +309,7 @@
       rawData = await Codec.decode(data);
       R = C.sanitize(rawData);
       if (!R.st.length) throw new Error('Recipe không có bước nào');
+      App.setTheme(R.th);
     } catch (e) {
       R = null;
       errorCode = e && e.code;
